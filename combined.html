@@ -11,17 +11,25 @@
     
     <!-- Chart.js library for the dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- 
+      Tailwind CSS via CDN (Play Version)
+      -------------------------------------
+      NOTE: The console warning about using this script in production is expected. 
+      For this self-contained demo, using the CDN is the correct approach.
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         /* --- CSS Variables for Easy Theme Management --- */
         :root {
-            --background-color: #F3F4F6; /* Light Gray */
-            --surface-color: #FFFFFF; /* White for cards */
+            --background-color: #F8FAFC; 
+            --surface-color: #FFFFFF;
             --border-color: #E2E8F0;
-            --primary-text-color: #1E293B; /* Dark Navy */
-            --secondary-text-color: #64748B; /* Medium Gray */
-            --accent-color: #7C3AED; /* Vibrant Purple */
-            --accent-light-color: #F5F3FF; /* Light Purple for active nav */
+            --primary-text-color: #1E293B;
+            --secondary-text-color: #64748B;
+            --accent-color: #7C3AED;
+            --accent-light-color: #F5F3FF;
         }
 
         /* --- General Styling & Light Theme --- */
@@ -102,10 +110,40 @@
         /* --- Footer --- */
         footer { text-align: center; padding: 4rem 2rem; background-color: #0F172A; color: #94A3B8; }
         
-        /* --- Form Page Styles (Sign In / Log In / User Details) --- */
-        .form-page-wrapper { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; box-sizing: border-box; }
-        .form-logo { font-weight: 700; font-size: 2.5rem; color: var(--primary-text-color); margin-bottom: 2rem; }
-        .form-container { width: 100%; max-width: 450px; padding: 2.5rem; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.75rem; box-sizing: border-box; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+        /* --- Form Page Styles --- */
+        .form-page-wrapper {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #f3f4f6, white);
+        }
+        .form-logo {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: var(--primary-text-color);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        .form-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            box-sizing: border-box;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            position: relative;
+            z-index: 1;
+        }
         .form-container h2 { text-align: center; font-size: 1.5rem; margin-top: 0; margin-bottom: 2rem; color: var(--primary-text-color); }
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--secondary-text-color); }
@@ -114,51 +152,95 @@
         .form-row .form-group { flex: 1; }
         .submit-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; background-color: var(--accent-color); color: #fff; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
         .submit-button:hover { background-color: #6D28D9; }
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .form-footer a {
+            color: var(--secondary-text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .form-footer a:hover {
+            color: var(--primary-text-color);
+        }
         
-        /* --- DASHBOARD STYLES --- */
-        .dashboard-header { display: flex; align-items: center; padding: 0 2rem; background-color: var(--surface-color); border-bottom: 1px solid var(--border-color); height: 70px; }
-        .dashboard-header .logo { font-size: 1.75rem; }
-        .dashboard-nav { display: flex; margin-left: 2rem; flex-grow: 1; }
-        .dashboard-nav a.nav-item { margin: 0; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; border-radius: 0; color: var(--secondary-text-color); }
-        .dashboard-nav a.nav-item:hover { color: var(--primary-text-color); background: none; }
-        .dashboard-nav a.nav-item.active { color: var(--accent-color); border-bottom-color: var(--accent-color); background: none; }
-        .user-actions { margin-left: auto; }
-        .user-actions .nav-item { color: var(--secondary-text-color); }
-        .user-actions .nav-item:hover { color: var(--accent-color); background: none; }
-        .main-content { padding: 2rem 3rem; }
-        .main-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-        .main-header h2 { font-size: 1.75rem; margin: 0; font-weight: 700; }
-        .main-header p { color: var(--secondary-text-color); margin: 0; padding-top: 0.25rem; }
-        .widgets-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start; }
-        .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1.5rem; }
-        .card h3 { margin-top: 0; padding-bottom: 1rem; margin-bottom: 1.5rem; }
-        .stat { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
-        .stat:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent-color); }
-        .stat-label { color: var(--secondary-text-color); font-size: 0.9rem; }
-        .action-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; background-color: var(--primary-text-color); color: var(--surface-color); font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 1.5rem; }
-        .activity-list { list-style: disc; padding-left: 1.25rem; margin: 0; }
-        .activity-list li { padding: 0.5rem 0; color: var(--secondary-text-color); }
-        .activity-list .value { color: var(--primary-text-color); font-weight: 500; }
-
-        /* --- Chat Styles --- */
-        .chat-icon-button { position: fixed; bottom: 2rem; right: 2rem; width: 60px; height: 60px; background-color: var(--accent-color); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; }
-        .chat-widget { position: fixed; bottom: 6rem; right: 2rem; width: 350px; max-height: 450px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.75rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; z-index: 999; opacity: 0; transform: translateY(20px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
-        .chat-widget.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); }
-        .chat-header .close-button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary-text-color); }
-        .chat-messages { flex-grow: 1; padding: 1rem; overflow-y: auto; }
-        .message { margin-bottom: 1rem; max-width: 85%; padding: 0.5rem 0.75rem; border-radius: 1rem; font-size: 0.9rem; }
-        .user-message { background-color: var(--accent-color); color: white; margin-left: auto; border-bottom-right-radius: 0; }
-        .bot-message { background-color: var(--background-color); border: 1px solid var(--border-color); margin-right: auto; border-bottom-left-radius: 0; }
-        .chat-input-form { display: flex; padding: 0.75rem; border-top: 1px solid var(--border-color); }
+        /* --- Community Page Styles --- */
+        #communityPage {
+            display: none;
+            padding: 3rem 2rem;
+        }
+        .community-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .community-container h1, .community-container > p {
+             text-align: center;
+        }
+        .community-container h1 {
+            font-size: 2.25rem;
+            font-family: 'Lora', serif;
+            color: var(--primary-text-color);
+            margin-bottom: 0.5rem;
+        }
+        .community-container > p {
+            font-size: 1.1rem;
+            color: var(--secondary-text-color);
+            margin-bottom: 3rem;
+        }
+        .community-section h2 {
+            font-size: 1.75rem;
+            font-family: 'Lora', serif;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .info-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .info-card-image {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+        .info-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .info-card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+        .info-card-content h3 {
+            font-size: 1.25rem;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            color: var(--primary-text-color);
+        }
+        .info-card-content p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--secondary-text-color);
+            margin: 0;
+        }
         
         @media (max-width: 768px) {
             .hero-content h1 { font-size: 2.5rem; }
-            .widgets-grid { grid-template-columns: 1fr; }
-            .dashboard-header { flex-direction: column; height: auto; padding: 1rem; }
-            .dashboard-nav { margin: 1rem 0 0 0; }
-            .chat-widget { bottom: 5.5rem; right: 1rem; width: calc(100% - 2rem); }
+            .info-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -166,180 +248,499 @@
 
     <header id="mainHeader">
         <div class="logo" id="logo">Aura</div>
-        <nav><a href="#">Pricing</a><a href="#">Docs</a><a href="#">Community</a><a id="logInLink">Log In</a><a id="signInLink">Sign In</a></nav>
+        <nav>
+            <a href="#">Pricing</a>
+            <a href="#">Docs</a>
+            <a href="#" id="communityLink">Community</a>
+            <a id="logInLink">Log In</a>
+            <a id="registerLink">Register</a> 
+            <a href="#" id="logOutButton" style="display:none;">Log Out</a>
+        </nav>
     </header>
 
     <div id="mainPage">
         <section class="hero-section">
             <div class="hero-content">
                 <h1>Welcome Users To Aura</h1>
-                <p>Aura is a platform for running full stack applications and databases close to your users. We run your code in tiny VMs on our own hardware in 30+ regions around the world.</p>
-                <a href="#" class="cta-button">Get Started<span>&rarr;</span></a>
+                <p>Living with diabetes is challenging — remembering every insulin dose shouldn’t be. We provide a reliable way to track injections and stay safe.</p>
+                <a href="#" class="cta-button" id="getStartedBtn">Get Started<span>&rarr;</span></a>
             </div>
             <img src="https://fly.io/phx/ui/images/cloud-city-a61199fec62cd744415fcdf4e1be8434.png?vsn=d" class="hero-background" alt="Cloud city illustration">
         </section>
-        <section class="content-section"><div class="section-container"><div class="features"><div class="feature-card"><h3>Run Your Code</h3><p>Bring your Dockerfile, or build on Aura with our buildpacks. Go from `git push` to a globally deployed app in minutes.</p></div><div class="feature-card"><h3>Scale Seamlessly</h3><p>Aura orchestrates your application, scaling it up and down based on traffic and demand, in any of our regions.</p></div><div class="feature-card"><h3>Add a Database</h3><p>Provision and manage Postgres databases. We handle the heavy lifting of replication and failover.</p></div></div></div></section>
+        <section class="content-section"><div class="section-container"><div class="features"><div class="feature-card"><h3>Run Your Code</h3><p>Bring your Dockerfile, or build on Aura with our buildpacks. Go from git push to a globally deployed app in minutes.</p></div><div class="feature-card"><h3>Scale Seamlessly</h3><p>Aura orchestrates your application, scaling it up and down based on traffic and demand, in any of our regions.</p></div><div class="feature-card"><h3>Add a Database</h3><p>Provision and manage Postgres databases. We handle the heavy lifting of replication and failover.</p></div></div></div></section>
         <section class="info-section"><div class="info-subsection"><h2>created by #psuedocoders</h2><div class="logo-grid"><div class="logo-item">Ayush pandey</div><div class="logo-item">swarnim tripathi</div><div class="logo-item">harsh pathak</div><div class="logo-item">Aryan raj</div></div></div></section>
         <footer><p>&copy; 2025 Aura. All rights reserved.</p></footer>
     </div>
-
-    <!-- Sign-In Page (hidden by default) -->
-    <div id="signInPage" class="form-page-wrapper">
-        <div class="form-container">
-            <h2>Sign in to Aura</h2>
-            <form id="signInForm">
-                <div class="form-group"><label for="email-signin">Email address</label><input type="email" id="email-signin" name="email" required></div>
-                <div class="form-group"><label for="password-signin">Password</label><input type="password" id="password-signin" name="password" required></div>
-                <button type="submit" class="submit-button">Continue</button>
-            </form>
+    
+    <!-- Community Page -->
+    <div id="communityPage" style="display: none;">
+        <div class="community-container">
+            <h1>Community</h1>
+            <p>Information and resources for managing diabetes.</p>
+            <div class="community-section">
+                <h2>General Information</h2>
+                <div class="info-grid">
+                    <div class="info-card"><div class="info-card-image" style="background-color: #FEF3C7;"><img src="https://img.icons8.com/external-vitaliy-gorbachev-flat-vitaly-gorbachev/58/000000/external-anatomy-online-learning-vitaliy-gorbachev-flat-vitaly-gorbachev.png" alt="Human Anatomy"></div><div class="info-card-content"><h3>What is Diabetes?</h3><p>Diabetes is a chronic condition that affects how your body processes blood sugar (glucose). With diabetes, your body either doesn’t make enough insulin or can’t effectively use the insulin it does make.</p></div></div>
+                    <div class="info-card"><div class="info-card-image" style="background-color: #D1FAE5;"><img src="https://img.icons8.com/color/48/000000/india.png" alt="Map of India"></div><div class="info-card-content"><h3>Diabetes in India</h3><p>India has a significant number of people living with diabetes, making it a major public health concern. The prevalence of diabetes in India has been increasing, driven by factors such as urbanization, dietary changes, and reduced physical activity.</p></div></div>
+                    <div class="info-card"><div class="info-card-image" style="background-color: #FEE2E2;"><img src="https://img.icons8.com/external-icongeek26-flat-icongeek26/64/000000/external-insulin-diabetes-icongeek26-flat-icongeek26.png" alt="Insulin Pen"></div><div class="info-card-content"><h3>Insulin</h3><p>Insulin is a hormone that allows your body to use glucose for energy. People with type 1 diabetes and some with type 2 need to take insulin because their bodies don’t produce enough or can’t use it effectively.</p></div></div>
+                </div>
+            </div>
+            <div class="community-section">
+                <h2>Management & Lifestyle</h2>
+                <div class="info-grid">
+                    <div class="info-card"><div class="info-card-image"><img src="https://img.icons8.com/external-smashing-flat-smashing-stocks/66/000000/external-prevention-cancer-survivors-day-smashing-flat-smashing-stocks.png" alt="Plant representing prevention"></div><div class="info-card-content"><h3>Prevention</h3><p>While not all types of diabetes are preventable, lifestyle changes can significantly reduce the risk of developing type 2 diabetes. These changes include maintaining a healthy weight, eating a balanced diet, and engaging in regular physical activity.</p></div></div>
+                    <div class="info-card"><div class="info-card-image"><img src="https://img.icons8.com/external-flaticons-flat-flat-icons/64/000000/external-cure-pharmaceutical-flaticons-flat-flat-icons.png" alt="Abstract cells representing cure"></div><div class="info-card-content"><h3>Cure</h3><p>Currently, there is no cure for diabetes. However, it can be effectively managed through medication, lifestyle changes, and regular monitoring. Research is ongoing to find a cure, but until then, managing the condition is crucial for maintaining health.</p></div></div>
+                </div>
+            </div>
+            <div class="form-footer">
+                <a href="#" class="backToHomeLink">&larr; Back to Home</a>
+            </div>
         </div>
     </div>
 
-    <!-- Log-In Page (hidden by default) -->
+    <!-- Registration Page -->
+    <div id="registerPage" class="form-page-wrapper">
+        <div style="position: relative; z-index: 1;">
+            <div class="form-logo">Aura</div>
+            <div class="form-container">
+                <h2>Create Your Account</h2>
+                <form id="registerForm">
+                    <div class="form-group"><label for="register-email">Email Address (Username)</label><input type="email" id="register-email" required></div>
+                    <div class="form-group"><label for="register-password">Password</label><input type="password" id="register-password" required></div>
+                    <hr style="margin: 1.5rem 0; border-color: var(--border-color);">
+                    <div class="form-group"><label for="register-name">Full Name</label><input type="text" id="register-name" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="register-age">Age</label><input type="number" id="register-age" required></div>
+                        <div class="form-group"><label for="register-gender">Gender</label><select id="register-gender" required><option value="">Select...</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                    </div>
+                    <div class="form-group"><label for="register-phone">Phone Number</label><input type="tel" id="register-phone" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="register-weight">Weight (kg)</label><input type="number" id="register-weight" required></div>
+                        <div class="form-group"><label for="register-height">Height (cm)</label><input type="number" id="register-height" required></div>
+                    </div>
+                    <button type="submit" class="submit-button">Register</button>
+                </form>
+                <div class="form-footer">
+                    <a href="#" id="backToLoginLink">&larr; Back to Login</a>
+                </div>
+            </div>
+        </div>
+        <img src="https://fly.io/phx/ui/images/cloud-city-a61199fec62cd744415fcdf4e1be8434.png?vsn=d" class="hero-background" alt="Cloud city illustration">
+    </div>
+
+    <!-- Log-In Page -->
     <div id="logInPage" class="form-page-wrapper">
-        <div class="form-container">
-            <h2>Log in to Aura</h2>
-            <form id="logInForm">
-                <div class="form-group"><label for="email-login">Email address</label><input type="email" id="email-login" name="email" required></div>
-                <div class="form-group"><label for="password-login">Password</label><input type="password" id="password-login" name="password" required></div>
-                <button type="submit" class="submit-button">Continue</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- NEW: User Details Page -->
-    <div id="userDetailsPage" class="form-page-wrapper">
-        <div class="form-logo">Aura</div>
-        <div class="form-container">
-            <h2>Tell us a bit about yourself</h2>
-            <form id="userDetailsForm">
-                <div class="form-group"><label for="userName">Name</label><input type="text" id="userName" required></div>
-                <div class="form-row">
-                    <div class="form-group"><label for="userAge">Age</label><input type="number" id="userAge" required></div>
-                    <div class="form-group"><label for="userGender">Gender</label><select id="userGender" required><option value="">Select...</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div>
+        <div style="position: relative; z-index: 1;">
+            <div class="form-container">
+                <h2>Log in to Aura</h2>
+                <form id="logInForm">
+                    <div class="form-group"><label for="email-login">Email address</label><input type="email" id="email-login" name="email" required></div>
+                    <div class="form-group"><label for="password-login">Password</label><input type="password" id="password-login" name="password" required></div>
+                    <button type="submit" class="submit-button">Continue</button>
+                </form>
+                 <div class="form-footer">
+                    <a href="#" class="backToHomeLink">&larr; Back to Home</a>
                 </div>
-                <div class="form-group"><label for="userPhone">Phone Number</label><input type="tel" id="userPhone" required></div>
-                <div class="form-row">
-                    <div class="form-group"><label for="userWeight">Weight (kg)</label><input type="number" id="userWeight" required></div>
-                    <div class="form-group"><label for="userHeight">Height (cm)</label><input type="number" id="userHeight" required></div>
-                </div>
-                <button type="submit" class="submit-button">Save & Continue</button>
-            </form>
+            </div>
         </div>
+        <img src="https://fly.io/phx/ui/images/cloud-city-a61199fec62cd744415fcdf4e1be8434.png?vsn=d" class="hero-background" alt="Cloud city illustration">
     </div>
 
     <!-- Dashboard Page -->
-    <div id="dashboardPage" style="display: none;">
-        <header class="dashboard-header"><h1 class="logo">Aura</h1><nav class="dashboard-nav"><a href="#" class="nav-item active">Dashboard</a><a href="#" class="nav-item">History</a><a href="#" class="nav-item">Recommendations</a><a href="#" class="nav-item">Settings</a></nav><div class="user-actions"><a href="#" class="nav-item" id="logOutButton">Log Out</a></div></header>
-        <main class="main-content"><header class="main-header"><h2>Welcome Back, User!</h2><p>Here is your glucose summary and prediction.</p></header><div class="widgets-grid"><div class="card chart-card"><h3>Glucose Trend (mg/dL)</h3><div class="chart-container"><canvas id="glucoseChart"></canvas></div></div><div class="card-column"><div class="card"><h3>Current Status</h3><div class="stat"><span class="stat-label">Current Glucose</span><span class="stat-value">112</span></div><div class="stat"><span class="stat-label">Short-Term Trend</span><span class="stat-value">Stable</span></div><button class="action-button">Get New Recommendation</button></div><div class="card"><h3>Recent Activity</h3><ul class="activity-list"><li><span class="time">08:00 AM</span> Measured Glucose: <span class="value">105 mg/dL</span></li><li><span class="time">08:05 AM</span> Logged Meal: <span class="value">45g Carbs</span></li><li><span class="time">08:07 AM</span> Administered Dose: <span class="value">4.5 units</span></li></ul></div></div></div></main>
-        <button id="chatIcon" class="chat-icon-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
-        <div id="chatWidget" class="chat-widget"><header class="chat-header"><h2>Aura Assistant</h2><button class="close-button" id="closeChatButton">&times;</button></header><div class="chat-messages" id="chatMessages"><div class="message bot-message">Hello! How can I help you today?</div></div><form class="chat-input-form" id="chatForm"><input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off"><button type="submit">Send</button></form></div>
+    <div id="dashboardPage" style="display: none;" class="bg-gray-50 min-h-screen p-4 sm:p-6">
+      <div class="max-w-6xl mx-auto space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold">Dashboard</h2>
+            <button id="devSimulateBtn" class="bg-yellow-400 text-yellow-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-yellow-500">DEV: Simulate Data</button>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow">
+          <canvas id="glucoseChart" height="160"></canvas>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div id="card-carbs" class="p-4 bg-white rounded-2xl shadow"><div class="text-sm text-gray-500">Carbs Detected</div><div id="carbs-value" class="text-3xl font-bold">—</div></div>
+          <div id="card-dose" class="p-4 bg-white rounded-2xl shadow"><div class="text-sm text-gray-500">Insulin Suggestion</div><div id="dose-value" class="text-3xl font-bold">—</div><div id="dose-reason" class="text-xs text-gray-500 mt-2"></div></div>
+          <div id="card-trend" class="p-4 bg-white rounded-2xl shadow"><div class="text-sm text-gray-500">Current Trend</div><div id="trend-value" class="text-3xl font-bold capitalize">—</div></div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow">
+          <div id="chat-history" class="space-y-3 h-48 overflow-auto mb-3 p-2 border rounded-lg"></div>
+          <div class="flex items-center gap-3">
+            <input id="chat-input" type="text" placeholder="e.g., had a sandwich and an apple" class="flex-1 p-3 rounded-lg border"/>
+            <button id="send-btn" class="px-4 py-3 bg-indigo-600 text-white rounded-lg font-semibold">Send</button>
+          </div>
+          <div id="thinking" class="mt-2 text-sm text-gray-500 hidden">Aura is thinking…</div>
+        </div>
+      </div>
     </div>
 
     <script>
-        // --- PAGE NAVIGATION & LOGIC ---
-        const mainPage = document.getElementById('mainPage');
-        const signInPage = document.getElementById('signInPage');
-        const logInPage = document.getElementById('logInPage');
-        const userDetailsPage = document.getElementById('userDetailsPage');
-        const dashboardPage = document.getElementById('dashboardPage');
-        const mainHeader = document.getElementById('mainHeader');
+        // --- CONFIG & GLOBAL STATE ---
+        const BASE_URL = 'http://127.0.0.1:5001';
+        let currentUserId = null;
+        let previewTimeout = null;
+        let currentPreviewAbort = null;
+
+        // --- PAGE ELEMENT REFERENCES ---
+        const pageRefs = {
+            mainPage: document.getElementById('mainPage'),
+            registerPage: document.getElementById('registerPage'),
+            logInPage: document.getElementById('logInPage'),
+            dashboardPage: document.getElementById('dashboardPage'),
+            communityPage: document.getElementById('communityPage'),
+            mainHeader: document.getElementById('mainHeader'),
+        };
         
-        // Form submit listeners
-        const signInForm = document.getElementById('signInForm');
+        // --- FORM/BUTTON REFERENCES ---
+        const registerForm = document.getElementById('registerForm');
         const logInForm = document.getElementById('logInForm');
-        const userDetailsForm = document.getElementById('userDetailsForm');
-        
-        const signInLink = document.getElementById('signInLink');
+        const registerLink = document.getElementById('registerLink');
         const logInLink = document.getElementById('logInLink');
+        const backToLoginLink = document.getElementById('backToLoginLink');
+        const getStartedBtn = document.getElementById('getStartedBtn');
+        const communityLink = document.getElementById('communityLink');
         const logOutButton = document.getElementById('logOutButton');
+        const logo = document.getElementById('logo');
+        const backToHomeLinks = document.querySelectorAll('.backToHomeLink');
+        const devSimulateBtn = document.getElementById('devSimulateBtn');
+
+        // --- DASHBOARD ELEMENT REFERENCES ---
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatHistory = document.getElementById('chat-history');
+        const thinkingEl = document.getElementById('thinking');
         
-        // Chat elements
-        const chatIcon = document.getElementById('chatIcon');
-        const chatWidget = document.getElementById('chatWidget');
-        const closeChatButton = document.getElementById('closeChatButton');
-        const chatForm = document.getElementById('chatForm');
-        const chatInput = document.getElementById('chatInput');
-        const chatMessages = document.getElementById('chatMessages');
+        const chartState = {
+          historyTimestamps: [],
+          historyValues: [],
+          chart: null
+        };
 
-        let glucoseChartInstance = null;
+        // --- CHART LOGIC ---
+        function formatLabel(ts) {
+          const d = new Date(ts);
+          return `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }
 
+        function initChart() {
+          if (chartState.chart) chartState.chart.destroy();
+          const ctx = document.getElementById('glucoseChart').getContext('2d');
+          chartState.chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [
+                { label: 'Historical', data: [], borderColor: '#4f46e5', borderWidth: 2.5, tension: 0.4, pointRadius: 3, fill: false },
+                { label: 'Predicted', data: [], borderColor: '#a5b4fc', borderWidth: 2.5, borderDash: [8,6], tension: 0.4, pointRadius: 3, fill: false }
+              ]
+            },
+            options: {
+              responsive: true, animation: { duration: 700, easing: 'easeInOutQuad' },
+              scales: { x: { grid: { display: false } }, y: { beginAtZero: false, grid: { color: '#e5e7eb' } } },
+              plugins: { legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8 } } }
+            }
+          });
+        }
+
+        function setHistoricalData(timestamps, values) {
+          chartState.historyTimestamps = timestamps;
+          chartState.historyValues = values;
+          chartState.chart.data.labels = timestamps.map(formatLabel);
+          chartState.chart.data.datasets[0].data = values;
+          chartState.chart.data.datasets[1].data = [];
+          chartState.chart.update('none');
+        }
+
+        function updatePrediction(predValues, predTimestamps) {
+          const timestamps = predTimestamps || generateTimestampsForHistory(predValues.length, true);
+          const fullLabels = chartState.historyTimestamps.map(formatLabel).concat(timestamps.map(formatLabel));
+          chartState.chart.data.labels = fullLabels;
+          
+          const predStartIndex = chartState.historyValues.length;
+          const lastHistoricalValue = chartState.historyValues[predStartIndex - 1];
+          const predData = new Array(predStartIndex - 1).fill(null);
+          predData.push(lastHistoricalValue, ...predValues);
+
+          chartState.chart.data.datasets[1].data = predData;
+          chartState.chart.update();
+        }
+        
+        // --- UI & MESSAGE LOGIC ---
+        function showThinking(on=true) { thinkingEl.classList.toggle('hidden', !on); }
+
+        function pushMessage(who, text) {
+          const el = document.createElement('div');
+          el.className = who === 'user' ? 'text-right' : 'text-left';
+          el.innerHTML = `<div class="inline-block p-2 rounded-lg ${who==='user' ? 'bg-indigo-100' : 'bg-gray-100'}">${text}</div>`;
+          chatHistory.appendChild(el);
+          chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function applyAiResponse(ai) {
+          try {
+            const gp = ai.glucose_prediction || {};
+            const parsed = ai.parsed_info || {};
+            const dose = ai.dose_recommendation || {};
+            const advice = ai.contextual_advice || {};
+
+            if (gp.adjusted_prediction && gp.adjusted_prediction.length) {
+                updatePrediction(gp.adjusted_prediction, gp.prediction_timestamps || null);
+            }
+
+            document.getElementById('carbs-value').innerText = `${parsed.carbs ?? '—'}g`;
+            document.getElementById('dose-value').innerText = `${dose.recommended_dose ?? '—'} units`;
+            document.getElementById('dose-reason').innerText = dose.reasoning ?? '';
+            document.getElementById('trend-value').innerText = (gp.analysis && gp.analysis.trend) || '—';
+
+            const auraLines = [];
+            if (advice.carb_bolus_needed && dose.recommended_dose) {
+              auraLines.push(`For this meal, I estimate a bolus of <b>~${dose.recommended_dose} units</b> is needed.`);
+            }
+            if (advice.exercise_reduction) {
+              auraLines.push(`Heads up! I recommend reducing your insulin dose by <b>${advice.exercise_reduction_percent ?? 25}%</b> to account for your vigorous exercise.`);
+            }
+            if (advice.timing_considerations && advice.timing_considerations.length) {
+              auraLines.push(...advice.timing_considerations);
+            }
+            if(auraLines.length > 0) pushMessage('aura', auraLines.join('<br/>'));
+
+          } catch (e) {
+            console.error('applyAiResponse error', e);
+            pushMessage('aura', 'Sorry, I encountered an error processing the data.');
+          }
+        }
+        
+        function generateTimestampsForHistory(n, future = false) {
+            const now = Date.now();
+            const step = 5 * 60 * 1000;
+            const arr = [];
+            if (future) {
+                for (let i = 1; i <= n; i++) { arr.push(new Date(now + i * step).toISOString()); }
+            } else {
+                for (let i = n - 1; i >= 0; i--) { arr.unshift(new Date(now - i * step).toISOString()); }
+            }
+            return arr;
+        }
+        
+        // --- API CALLS ---
+        async function sendMessageToApi(message, { preview=false } = {}) {
+            if (!currentUserId) {
+                alert("Please log in first.");
+                return;
+            }
+            if (!preview) pushMessage('user', message);
+            showThinking(true);
+            
+            if (preview && currentPreviewAbort) {
+                currentPreviewAbort.abort();
+            }
+            currentPreviewAbort = new AbortController();
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/chat${preview ? '?preview=true' : ''}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, user_id: currentUserId }),
+                    signal: preview ? currentPreviewAbort.signal : null,
+                });
+
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+                
+                const ai = await response.json();
+                
+                if (!preview) {
+                    applyAiResponse(ai);
+                } else {
+                    const gp = ai.glucose_prediction || {};
+                    if (gp.adjusted_prediction) {
+                        updatePrediction(gp.adjusted_prediction, gp.prediction_timestamps || null);
+                    }
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return; // Expected on fast typing
+                console.error(err);
+                if (!preview) pushMessage('aura', 'Sorry — something went wrong. Please try again.');
+            } finally {
+                showThinking(false);
+            }
+        }
+
+        async function loadDashboardData(userId) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/dashboard?user_id=${userId}`);
+                if (!response.ok) throw new Error("Could not load dashboard data.");
+                
+                const data = await response.json();
+                
+                if (data.glucose_readings && data.glucose_readings.length > 0) {
+                    const timestamps = data.glucose_readings.map(r => r.timestamp);
+                    const values = data.glucose_readings.map(r => r.glucose_value);
+                    setHistoricalData(timestamps, values);
+                } else {
+                    setHistoricalData([], []); // For new users
+                }
+            } catch (error) {
+                console.error("Dashboard load error:", error);
+                setHistoricalData([], []); // Show empty chart on error
+            }
+        }
+
+        // --- PAGE NAVIGATION ---
         function hideAllPages() {
-            mainHeader.style.display = 'none';
-            mainPage.style.display = 'none';
-            signInPage.style.display = 'none';
-            logInPage.style.display = 'none';
-            userDetailsPage.style.display = 'none';
-            dashboardPage.style.display = 'none';
+            Object.values(pageRefs).forEach(el => {
+                if (el && el.style) el.style.display = 'none';
+            });
+            pageRefs.mainHeader.style.display = 'none';
         }
 
         function showMainPage() {
             hideAllPages();
-            mainHeader.style.display = 'flex';
-            mainPage.style.display = 'block';
+            pageRefs.mainHeader.style.display = 'flex';
+            pageRefs.mainPage.style.display = 'block';
+            logOutButton.style.display = 'none';
+            registerLink.style.display = 'block';
+            logInLink.style.display = 'block';
         }
 
-        function showSignInPage() {
-            hideAllPages();
-            signInPage.style.display = 'flex';
-        }
-
-        function showLogInPage() {
-            hideAllPages();
-            logInPage.style.display = 'flex';
-        }
+        function showRegisterPage() { hideAllPages(); pageRefs.registerPage.style.display = 'flex'; }
+        function showLogInPage() { hideAllPages(); pageRefs.logInPage.style.display = 'flex'; }
+        function showCommunityPage() { hideAllPages(); pageRefs.mainHeader.style.display = 'flex'; pageRefs.communityPage.style.display = 'block';}
         
-        function showUserDetailsPage() {
-            hideAllPages();
-            userDetailsPage.style.display = 'flex';
-        }
-
-        function showDashboardPage() {
-            hideAllPages();
-            dashboardPage.style.display = 'block';
-            initializeDashboard();
-        }
-
-        function addMessage(message, sender) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
-            messageElement.textContent = message;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        chatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const userMessage = chatInput.value.trim();
-            if (userMessage) {
-                addMessage(userMessage, 'user');
-                chatInput.value = '';
-                setTimeout(() => { addMessage("I am a demo assistant. I'm still learning!", 'bot'); }, 1000);
+        async function showDashboardPage() {
+            if (!currentUserId) {
+                alert("Login required.");
+                showLogInPage();
+                return;
             }
-        });
-
-        function initializeDashboard() {
-            if (glucoseChartInstance) { glucoseChartInstance.destroy(); }
-            const ctx = document.getElementById('glucoseChart').getContext('2d');
-            glucoseChartInstance = new Chart(ctx, {
-                type: 'line', data: { labels: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'], datasets: [{ label: 'Historical', data: [105, 115, 140, 130, 110, 95, 100, null], borderColor: '#7C3AED', backgroundColor: 'rgba(124, 58, 237, 0.1)', fill: true, tension: 0.4 }, { label: 'Predicted', data: [null, null, null, null, null, null, 100, 110, 120], borderColor: '#94A3B8', borderDash: [5, 5], fill: false, tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B' } }, x: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B' } } }, plugins: { legend: { labels: { color: '#64748B' } } } }
-            });
+            hideAllPages();
+            pageRefs.mainHeader.style.display = 'flex';
+            pageRefs.dashboardPage.style.display = 'block';
+            logOutButton.style.display = 'block';
+            registerLink.style.display = 'none';
+            logInLink.style.display = 'none';
+            
+            chatHistory.innerHTML = '';
+            pushMessage('aura', 'Welcome! Enter a meal or activity to get started.');
+            await loadDashboardData(currentUserId);
         }
         
         // --- EVENT LISTENERS ---
-        signInLink.addEventListener('click', (e) => { e.preventDefault(); showSignInPage(); });
+        logo.addEventListener('click', (e) => { e.preventDefault(); showMainPage(); });
+        registerLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterPage(); });
         logInLink.addEventListener('click', (e) => { e.preventDefault(); showLogInPage(); });
-        logOutButton.addEventListener('click', (e) => { e.preventDefault(); showMainPage(); });
+        backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogInPage(); });
+        getStartedBtn.addEventListener('click', (e) => { e.preventDefault(); showRegisterPage(); });
+        communityLink.addEventListener('click', (e) => { e.preventDefault(); showCommunityPage(); });
         
-        signInForm.addEventListener('submit', (e) => { e.preventDefault(); showUserDetailsPage(); });
-        logInForm.addEventListener('submit', (e) => { e.preventDefault(); showDashboardPage(); });
-        userDetailsForm.addEventListener('submit', (e) => { e.preventDefault(); showDashboardPage(); });
+        logOutButton.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            currentUserId = null; // Log out by clearing the user ID
+            showMainPage(); 
+        });
         
-        chatIcon.addEventListener('click', () => chatWidget.classList.toggle('visible'));
-        closeChatButton.addEventListener('click', () => chatWidget.classList.remove('visible'));
+        backToHomeLinks.forEach(link => {
+            link.addEventListener('click', (e) => { e.preventDefault(); showMainPage(); });
+        });
         
-        document.addEventListener('DOMContentLoaded', showMainPage);
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userData = {
+                username: document.getElementById('register-email').value,
+                password: document.getElementById('register-password').value,
+                name: document.getElementById('register-name').value,
+                age: parseInt(document.getElementById('register-age').value),
+                gender: document.getElementById('register-gender').value,
+                phone_number: document.getElementById('register-phone').value,
+                weight_kg: parseFloat(document.getElementById('register-weight').value),
+                height_cm: parseFloat(document.getElementById('register-height').value)
+            };
+
+            try {
+                const response = await fetch(`${BASE_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                if (response.status === 201) {
+                    alert("Registration successful! Please log in.");
+                    showLogInPage();
+                } else {
+                    const error = await response.json();
+                    alert(`Registration failed: ${error.message || 'Username may already be taken.'}`);
+                }
+            } catch (error) {
+                console.error("Registration error:", error);
+                alert("Could not connect to the server.");
+            }
+        });
+
+        logInForm.addEventListener('submit', async (e) => { 
+            e.preventDefault();
+            const loginData = {
+                username: document.getElementById('email-login').value,
+                password: document.getElementById('password-login').value
+            };
+
+            try {
+                const response = await fetch(`${BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUserId = data.user_id; // CRITICAL: Store the user ID
+                    showDashboardPage();
+                } else {
+                    alert("Login failed: Invalid username or password.");
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                alert("Could not connect to the server.");
+            }
+        });
+
+        sendBtn.addEventListener('click', () => {
+          const text = chatInput.value.trim();
+          if (!text) return;
+          sendMessageToApi(text, { preview:false });
+          chatInput.value = '';
+        });
+        
+        chatInput.addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') sendBtn.click();
+        });
+
+        chatInput.addEventListener('input', () => {
+            if (previewTimeout) clearTimeout(previewTimeout);
+            previewTimeout = setTimeout(() => {
+                const text = chatInput.value.trim();
+                if (!text) return;
+                sendMessageToApi(text, { preview: true });
+            }, 400);
+        });
+
+        devSimulateBtn.addEventListener('click', async () => {
+            if (!currentUserId) return alert("Please log in first.");
+            try {
+                const response = await fetch(`${BASE_URL}/api/dev/simulate-data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId }),
+                });
+                if (!response.ok) throw new Error("Failed to simulate data.");
+                alert("New data simulated successfully! Refreshing dashboard.");
+                await loadDashboardData(currentUserId);
+            } catch (error) {
+                console.error("Simulate data error:", error);
+                alert("Could not simulate new data.");
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            showMainPage();
+        });
     </script>
+
 </body>
 </html>
