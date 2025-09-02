@@ -217,6 +217,19 @@
       .form-footer a:hover {
         color: var(--primary-text-color);
       }
+      /* Custom tooltip for chart */
+      #chart-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+        z-index: 100;
+        font-size: 0.85rem;
+      }
     </style>
   </head>
   <body>
@@ -225,6 +238,9 @@
       <nav>
         <a id="logInLink">Log In</a>
         <a id="registerLink">Register</a>
+        <a href="#" id="downloadReportBtn" style="display: none"
+          >Download Report</a
+        >
         <a href="#" id="logOutButton" style="display: none">Log Out</a>
       </nav>
     </header>
@@ -344,15 +360,24 @@
       <div class="max-w-6xl mx-auto space-y-6 p-4 sm:p-6">
         <div class="flex justify-between items-center">
           <h2 class="text-2xl font-bold">Dashboard</h2>
-          <button
-            id="devSimulateBtn"
-            class="bg-yellow-400 text-yellow-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-yellow-500"
-          >
-            DEV: Add Demo Data
-          </button>
+          <div class="flex items-center gap-2">
+            <button
+              id="calibrateAiBtn"
+              class="bg-blue-400 text-blue-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-blue-500"
+            >
+              Calibrate AI
+            </button>
+            <button
+              id="devSimulateBtn"
+              class="bg-yellow-400 text-yellow-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-yellow-500"
+            >
+              DEV: Add Demo Data
+            </button>
+          </div>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow">
-          <canvas id="glucoseChart" height="160"></canvas>
+        <div class="bg-white p-4 rounded-2xl shadow relative">
+          <canvas id="glucoseChart" height="200"></canvas>
+          <div id="chart-tooltip"></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="p-4 bg-white rounded-2xl shadow">
@@ -372,7 +397,7 @@
         <div class="bg-white p-4 rounded-2xl shadow">
           <div
             id="chat-history"
-            class="space-y-3 h-48 overflow-auto mb-3 p-2 border rounded-lg"
+            class="space-y-3 h-72 overflow-auto mb-3 p-2 border rounded-lg"
           ></div>
           <div class="flex items-center gap-3">
             <input
@@ -398,7 +423,7 @@
     <script>
       const BASE_URL = "http://127.0.0.1:5001";
       let currentUserId = null;
-      let chartState = { chart: null };
+      let chartState = { chart: null, historicalData: [], predictionData: [] };
 
       // --- ELEMENT REFERENCES ---
       const pageRefs = {
@@ -415,16 +440,19 @@
       const registerLink = document.getElementById("registerLink");
       const logInLink = document.getElementById("logInLink");
       const logOutButton = document.getElementById("logOutButton");
+      const downloadReportBtn = document.getElementById("downloadReportBtn");
       const backToLoginLink = document.getElementById("backToLoginLink");
       const getStartedBtn = document.getElementById("getStartedBtn");
       const logo = document.getElementById("logo");
       const backToHomeLinks = document.querySelectorAll(".backToHomeLink");
       const devSimulateBtn = document.getElementById("devSimulateBtn");
+      const calibrateAiBtn = document.getElementById("calibrateAiBtn");
       // Dashboard Elements
       const chatInput = document.getElementById("chat-input");
       const sendBtn = document.getElementById("send-btn");
       const chatHistory = document.getElementById("chat-history");
       const thinkingEl = document.getElementById("thinking");
+      const chartTooltip = document.getElementById("chart-tooltip");
 
       // --- CHART LOGIC ---
       function formatLabel(ts) {
@@ -472,29 +500,66 @@
             plugins: {
               legend: { display: true, position: "top", align: "end" },
             },
+            onClick: (e, elements) => {
+              if (elements.length > 0) {
+                const element = elements[0];
+                const datasetIndex = element.datasetIndex;
+                const index = element.index;
+                let dataPoint;
+
+                if (datasetIndex === 0) {
+                  dataPoint = chartState.historicalData[index];
+                } else if (datasetIndex === 1 && chartState.predictionData.length > 0) {
+                  const historicalLength = chartState.historicalData.length;
+                  if (index >= historicalLength) {
+                    dataPoint = {
+                      glucose_value: chartState.predictionData[index - historicalLength],
+                      timestamp: "Predicted"
+                    };
+                  }
+                }
+                
+                if (dataPoint) {
+                  const value = dataPoint.glucose_value;
+                  const timestamp = dataPoint.timestamp === "Predicted" 
+                                    ? "Predicted" 
+                                    : new Date(dataPoint.timestamp).toLocaleString();
+                  const text = `Glucose: ${value} mg/dL<br>Time: ${timestamp}`;
+                  
+                  const canvasRect = ctx.canvas.getBoundingClientRect();
+                  chartTooltip.innerHTML = text;
+                  chartTooltip.style.left = `${e.native.clientX - canvasRect.left + 10}px`;
+                  chartTooltip.style.top = `${e.native.clientY - canvasRect.top + 10}px`;
+                  chartTooltip.style.opacity = 1;
+                }
+              } else {
+                chartTooltip.style.opacity = 0;
+              }
+            },
           },
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#glucoseChart')) {
+                chartTooltip.style.opacity = 0;
+            }
         });
       }
 
       function updateChart(historicalData, predictionData = []) {
-        const histTimestamps = historicalData.map((d) =>
-          formatLabel(d.timestamp)
-        );
+        chartState.historicalData = historicalData;
+        chartState.predictionData = predictionData;
+
+        const histTimestamps = historicalData.map((d) => formatLabel(d.timestamp));
         const histValues = historicalData.map((d) => d.glucose_value);
 
         let predLabels = [];
         let predValuesForChart = [];
 
-        if (predictionData.length > 0) {
-          const lastHistTimestamp = new Date(
-            historicalData[historicalData.length - 1].timestamp
-          );
+        if (predictionData.length > 0 && historicalData.length > 0) {
+          const lastHistTimestamp = new Date(historicalData[historicalData.length - 1].timestamp);
           predLabels = predictionData.map((_, i) =>
-            formatLabel(
-              new Date(lastHistTimestamp.getTime() + (i + 1) * 5 * 60000)
-            )
+            formatLabel(new Date(lastHistTimestamp.getTime() + (i + 1) * 5 * 60000))
           );
-
           const lastHistValue = histValues[histValues.length - 1];
           predValuesForChart = new Array(histValues.length - 1).fill(null);
           predValuesForChart.push(lastHistValue, ...predictionData);
@@ -511,104 +576,103 @@
         thinkingEl.classList.toggle("hidden", !on);
       }
 
-      function pushMessage(who, text) {
+      function editMessage(messageText) {
+        chatInput.value = messageText;
+        chatInput.focus();
+      }
+
+      function pushMessage(who, text, rawText = "") {
         const el = document.createElement("div");
         el.className = who === "user" ? "text-right" : "text-left";
-        el.innerHTML = `<div class="inline-block p-2 rounded-lg text-sm ${
+        
+        let messageContent = `<div class="inline-block p-2 rounded-lg text-sm ${
           who === "user"
             ? "bg-indigo-100 text-indigo-800"
             : "bg-gray-100 text-gray-800"
-        }">${text}</div>`;
+        }">${text}`;
+
+        if (who === "user") {
+          messageContent += `
+            <button class="ml-2 text-indigo-600 hover:text-indigo-800 text-xs" 
+                    onclick="editMessage(decodeURIComponent('${encodeURIComponent(rawText || text)}'))">
+              Edit
+            </button>`;
+        }
+        messageContent += `</div>`;
+        el.innerHTML = messageContent;
         chatHistory.appendChild(el);
         chatHistory.scrollTop = chatHistory.scrollHeight;
       }
 
-      // In combined.html, replace the old function with this one
+      function applyAiResponseToUI(aiResponse) {
+        console.log("Applying AI Response to UI:", aiResponse);
 
-// In combined.html, replace the old function with this one
+        const {
+          parsed_info, dose_recommendation, glucose_prediction, contextual_advice,
+        } = aiResponse;
 
-function applyAiResponseToUI(aiResponse) {
-    console.log("Applying AI Response to UI:", aiResponse);
+        const carbsEl = document.getElementById("carbs-value");
+        const doseEl = document.getElementById("dose-value");
+        const reasonEl = document.getElementById("dose-reason");
+        const trendEl = document.getElementById("trend-value");
 
-    const {
-      parsed_info,
-      dose_recommendation,
-      glucose_prediction,
-      contextual_advice,
-    } = aiResponse;
+        if (parsed_info && typeof parsed_info.carbs !== 'undefined') {
+            carbsEl.innerText = `${parsed_info.carbs}g`;
+        } else { carbsEl.innerText = "—"; }
 
-    // --- Update Dashboard Cards (this part is working well) ---
-    const carbsEl = document.getElementById("carbs-value");
-    const doseEl = document.getElementById("dose-value");
-    const reasonEl = document.getElementById("dose-reason");
-    const trendEl = document.getElementById("trend-value");
-
-    if (parsed_info && typeof parsed_info.carbs !== 'undefined') {
-        carbsEl.innerText = `${parsed_info.carbs}g`;
-    } else { carbsEl.innerText = "—"; }
-
-    if (dose_recommendation && typeof dose_recommendation.recommended_dose !== 'undefined') {
-        doseEl.innerText = `${dose_recommendation.recommended_dose}u`;
-        if (dose_recommendation.reasoning_components) {
-            reasonEl.innerText = dose_recommendation.reasoning_components.final_summary;
+        if (dose_recommendation && typeof dose_recommendation.recommended_dose !== 'undefined') {
+            doseEl.innerText = `${dose_recommendation.recommended_dose}u`;
+            reasonEl.innerText = (dose_recommendation.reasoning_components ? dose_recommendation.reasoning_components.final_summary : dose_recommendation.reasoning) || "";
         } else {
-            reasonEl.innerText = dose_recommendation.reasoning || "";
+            doseEl.innerText = "—";
+            reasonEl.innerText = "";
         }
-    } else {
-        doseEl.innerText = "—";
-        reasonEl.innerText = "";
-    }
-    
-    if (glucose_prediction && glucose_prediction.analysis && glucose_prediction.analysis.trend) {
-        trendEl.innerText = glucose_prediction.analysis.trend;
-    } else {
-        trendEl.innerText = "N/A";
-    }
-
-    // --- NEW AND IMPROVED CHATBOT RESPONSE LOGIC ---
-    let botReply = "";
-
-    // 1. Acknowledge the user's input
-    if (parsed_info.carbs > 0 && parsed_info.activities_detected.length > 0) {
-        botReply = `Okay, I've logged your meal of ${parsed_info.carbs}g and your workout. `;
-    } else if (parsed_info.carbs > 0) {
-        botReply = `Got it. Logged a meal of ${parsed_info.carbs}g. `;
-    } else if (parsed_info.activities_detected.length > 0) {
-        botReply = `Great job on the workout! I've logged it for you. `;
-    } else {
-        botReply = "I've logged your entry. ";
-    }
-
-    // 2. Give the most important piece of advice: the dose
-    if (dose_recommendation && dose_recommendation.recommended_dose > 0) {
-        botReply += `Based on this, my suggested dose is <b>${dose_recommendation.recommended_dose} units</b>.`;
-    } else {
-        botReply += "No insulin dose seems necessary right now.";
-    }
-    
-    // 3. Add any extra warnings or advice from the contextual engine
-    if (contextual_advice) {
-        if (contextual_advice.exercise_reduction) {
-            botReply += `<br><br><b>Heads up:</b> Since you're exercising, you should consider reducing that dose by about <b>${contextual_advice.exercise_reduction_percent}%</b> to avoid going low.`;
+        
+        if (glucose_prediction && glucose_prediction.analysis && glucose_prediction.analysis.trend) {
+            trendEl.innerText = glucose_prediction.analysis.trend;
+        } else {
+            trendEl.innerText = "N/A";
         }
-        if (contextual_advice.timing_considerations && contextual_advice.timing_considerations.length > 0) {
-            botReply += `<br><br><i>Note: ${contextual_advice.timing_considerations[0]}</i>`;
-        }
-    }
 
-    // Push the complete, intelligent message to the chat
-    pushMessage("aura", botReply);
-}
+        let botReply = "";
+        if (parsed_info && parsed_info.carbs > 0 && parsed_info.activities_detected && parsed_info.activities_detected.length > 0) {
+            botReply = `Okay, I've logged your meal of ${parsed_info.carbs}g and your workout. `;
+        } else if (parsed_info && parsed_info.carbs > 0) {
+            botReply = `Got it. Logged a meal of ${parsed_info.carbs}g. `;
+        } else if (parsed_info && parsed_info.activities_detected && parsed_info.activities_detected.length > 0) {
+            botReply = `Great job on the workout! I've logged it for you. `;
+        } else {
+            botReply = "I've logged your entry. ";
+        }
+
+        if (dose_recommendation && dose_recommendation.recommended_dose > 0) {
+            botReply += `Based on this, my suggested dose is <b>${dose_recommendation.recommended_dose} units</b>.`;
+        } else {
+            botReply += "No insulin dose seems necessary right now.";
+        }
+        
+        if (contextual_advice) {
+            if (contextual_advice.exercise_reduction) {
+                botReply += `<br><br><b>Heads up:</b> Since you're exercising, you should consider reducing that dose by about <b>${contextual_advice.exercise_reduction_percent}%</b> to avoid going low.`;
+            }
+            if (contextual_advice.timing_considerations && contextual_advice.timing_considerations.length > 0) {
+                botReply += `<br><br><i>Note: ${contextual_advice.timing_considerations[0]}</i>`;
+            }
+        }
+        pushMessage("aura", botReply);
+      }
 
       // --- API CALLS ---
       async function callApi(endpoint, options = {}) {
         try {
           const response = await fetch(`${BASE_URL}${endpoint}`, options);
           if (!response.ok) {
-            const error = await response
-              .json()
-              .catch(() => ({ message: response.statusText }));
+            const error = await response.json().catch(() => ({ message: response.statusText }));
             throw new Error(error.message || error.error || "Request failed");
+          }
+          // For file downloads, we don't expect JSON
+          if (response.headers.get("Content-Type")?.includes("application/pdf")) {
+              return response.blob();
           }
           return response.json();
         } catch (error) {
@@ -622,10 +686,8 @@ function applyAiResponseToUI(aiResponse) {
         if (!currentUserId) return;
         try {
           const data = await callApi(`/api/dashboard?user_id=${currentUserId}`);
-          console.log("Data received from backend:", data); // DEBUG LINE
           updateChart(data.glucose_readings || []);
         } catch (error) {
-          // If the call fails, we still want to show an empty chart
           updateChart([]);
         }
       }
@@ -644,26 +706,17 @@ function applyAiResponseToUI(aiResponse) {
 
       function updateNav(isLoggedIn) {
         logOutButton.style.display = isLoggedIn ? "block" : "none";
+        downloadReportBtn.style.display = isLoggedIn ? "block" : "none";
         registerLink.style.display = isLoggedIn ? "none" : "block";
         logInLink.style.display = isLoggedIn ? "none" : "block";
       }
 
-      function showMainPage() {
-        showPage("mainPage");
-        updateNav(false);
-      }
-      function showRegisterPage() {
-        showPage("registerPage", true);
-      }
-      function showLogInPage() {
-        showPage("logInPage", true);
-      }
+      function showMainPage() { showPage("mainPage"); updateNav(false); }
+      function showRegisterPage() { showPage("registerPage", true); }
+      function showLogInPage() { showPage("logInPage", true); }
 
       async function showDashboardPage() {
-        if (!currentUserId) {
-          showLogInPage();
-          return;
-        }
+        if (!currentUserId) { showLogInPage(); return; }
         showPage("dashboardPage");
         updateNav(true);
         chatHistory.innerHTML = "";
@@ -672,38 +725,41 @@ function applyAiResponseToUI(aiResponse) {
       }
 
       // --- EVENT LISTENERS ---
-      logo.addEventListener("click", (e) => {
-        e.preventDefault();
-        showMainPage();
-      });
-      registerLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        showRegisterPage();
-      });
-      logInLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        showLogInPage();
-      });
-      backToLoginLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        showLogInPage();
-      });
-      getStartedBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        showRegisterPage();
-      });
-      logOutButton.addEventListener("click", (e) => {
-        e.preventDefault();
-        currentUserId = null;
-        showMainPage();
-      });
+      logo.addEventListener("click", (e) => { e.preventDefault(); showMainPage(); });
+      registerLink.addEventListener("click", (e) => { e.preventDefault(); showRegisterPage(); });
+      logInLink.addEventListener("click", (e) => { e.preventDefault(); showLogInPage(); });
+      backToLoginLink.addEventListener("click", (e) => { e.preventDefault(); showLogInPage(); });
+      getStartedBtn.addEventListener("click", (e) => { e.preventDefault(); showRegisterPage(); });
+      logOutButton.addEventListener("click", (e) => { e.preventDefault(); currentUserId = null; showMainPage(); });
       backToHomeLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          showMainPage();
-        });
+        link.addEventListener("click", (e) => { e.preventDefault(); showMainPage(); });
       });
 
+      downloadReportBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!currentUserId) return alert("Please log in to download a report.");
+        // The backend now generates the PDF. We just need to open the URL.
+        const reportUrl = `${BASE_URL}/api/user/report?user_id=${currentUserId}`;
+        window.open(reportUrl, '_blank');
+      });
+
+      calibrateAiBtn.addEventListener("click", async () => {
+        if (!currentUserId) return alert("Log in first.");
+        if (!confirm("This will start personalizing the AI model based on your historical data. This process runs in the background and may take a few minutes. Continue?")) {
+            return;
+        }
+        try {
+            const response = await callApi("/api/ai/calibrate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: currentUserId }),
+            });
+            alert(response.message || "AI calibration has started successfully in the background.");
+        } catch (error) {
+            // Error is already alerted by callApi
+        }
+      });
+      
       registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const userData = {
@@ -713,12 +769,8 @@ function applyAiResponseToUI(aiResponse) {
           age: parseInt(document.getElementById("register-age").value) || null,
           gender: document.getElementById("register-gender").value || null,
           phone_number: document.getElementById("register-phone").value || null,
-          weight_kg:
-            parseFloat(document.getElementById("register-weight").value) ||
-            null,
-          height_cm:
-            parseFloat(document.getElementById("register-height").value) ||
-            null,
+          weight_kg: parseFloat(document.getElementById("register-weight").value) || null,
+          height_cm: parseFloat(document.getElementById("register-height").value) || null,
         };
         try {
           await callApi("/register", {
@@ -749,10 +801,9 @@ function applyAiResponseToUI(aiResponse) {
       });
 
       sendBtn.addEventListener("click", async () => {
-        console.log("Send button clicked!"); // <-- ADD THIS LINE
         const text = chatInput.value.trim();
         if (!text || !currentUserId) return;
-        pushMessage("user", text);
+        pushMessage("user", text, text);
         chatInput.value = "";
         showThinking(true);
         try {
@@ -762,19 +813,13 @@ function applyAiResponseToUI(aiResponse) {
             body: JSON.stringify({ message: text, user_id: currentUserId }),
           });
           applyAiResponseToUI(aiResponse);
-          // Now, update the chart with the new prediction from the chat response
-          const historicalData = await callApi(
-            `/api/dashboard?user_id=${currentUserId}`
-          );
+          const historicalData = await callApi(`/api/dashboard?user_id=${currentUserId}`);
           updateChart(
-    historicalData.glucose_readings || [],
-    aiResponse.glucose_prediction.adjusted_prediction || [] 
-);
-        } catch (error) {
-          pushMessage(
-            "aura",
-            "Sorry, I couldn't get a response. Please check the connection."
+            historicalData.glucose_readings || [],
+            aiResponse.glucose_prediction.adjusted_prediction || []
           );
+        } catch (error) {
+          pushMessage("aura", "Sorry, I couldn't get a response. Please check the connection.");
         } finally {
           showThinking(false);
         }
@@ -791,9 +836,7 @@ function applyAiResponseToUI(aiResponse) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ user_id: currentUserId }),
           });
-          alert(
-            "New demo data has been added! The dashboard will now refresh."
-          );
+          alert("New demo data has been added! The dashboard will now refresh.");
           await loadDashboardData();
         } catch (error) {}
       });
