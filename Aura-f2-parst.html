@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura</title>
+    <style>
+        /* --- Main Body and Background Styling --- */
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            color: #fff;
+            background-color: #000;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://fly.io/images/backgrounds/gradient-blur-2.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        /* --- Header and Navigation --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        nav {
+            display: flex;
+            align-items: center;
+        }
+        nav a {
+            margin: 0 1.5rem;
+            text-decoration: none;
+            color: #a3a3a3;
+            cursor: pointer;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+
+        /* --- Main Hero Section --- */
+        .main-content {
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+        }
+        .main-content h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            background: -webkit-linear-gradient(45deg, #fff, #a3a3a3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .main-content p {
+            font-size: 1.25rem;
+            color: #a3a3a3;
+            margin: 0 auto 2.5rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        .cta-button {
+            background-color: #fff;
+            color: #000;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .cta-button:hover {
+            background-color: #d1d1d1;
+        }
+        
+        /* --- Terminal Window Simulation --- */
+        .terminal-section {
+            display: flex;
+            justify-content: center;
+            padding: 0 2rem 4rem;
+        }
+        .terminal-window {
+            background-color: rgba(20, 20, 20, 0.8);
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            padding: 1rem;
+        }
+        .terminal-header {
+            padding-bottom: 1rem;
+            color: #666;
+            border-bottom: 1px solid #333;
+        }
+        .terminal-body {
+            padding-top: 1rem;
+            color: #ddd;
+        }
+        .terminal-body pre {
+            margin: 0;
+        }
+        .terminal-body .command::before {
+            content: '$ ';
+            color: #888;
+        }
+        .terminal-body .output {
+            color: #00f5a0;
+        }
+
+        /* --- Features Section --- */
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 4rem 2rem;
+            flex-wrap: wrap;
+        }
+        .feature-card {
+            background-color: transparent;
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            width: 300px;
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            color: #fff;
+        }
+        .feature-card p {
+            color: #a3a3a3;
+            line-height: 1.6;
+        }
+
+        /* --- Information Section Styling --- */
+        .info-section {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .info-section h2 {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 3rem;
+        }
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .logo-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(30, 30, 30, 0.5);
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #a3a3a3;
+        }
+        .info-subsection {
+            margin-bottom: 5rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid #333;
+            margin-top: 4rem;
+        }
+        
+        /* --- Sign-in & Log-in Page Styles (shared) --- */
+        .form-container {
+            display: none; /* Hidden by default, made visible by JavaScript */
+            padding: 2rem;
+            max-width: 400px;
+            margin: 4rem auto;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+        }
+        .form-container h2 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #a3a3a3;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #444;
+            border-radius: 0.5rem;
+            background-color: #050505;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        .submit-button {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            background-color: #fff;
+            color: #000;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .social-signin {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .social-signin p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+        .social-button {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #444;
+            border-radius: 0.5rem;
+            background-color: #111;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .back-to-home {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .back-to-home a {
+            color: #a3a3a3;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .back-to-home a:hover {
+            color: #fff;
+        }
+
+        /* --- Responsive Design for Smaller Screens --- */
+        @media (max-width: 768px) {
+            .main-content h1 {
+                font-size: 2.5rem;
+            }
+            nav a {
+                margin: 0 0.5rem;
+            }
+            .features, .logo-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" id="logo">Aura</div>
+        <nav>
+            <a href="#">Pricing</a>
+            <a href="#">Docs</a>
+            <a href="#">Community</a>
+            <a id="logInLink">Log In</a>
+            <a id="signInLink">Sign In</a>
+        </nav>
+    </header>
+
+    <!-- This container holds the main homepage content -->
+    <div id="mainPage">
+        <main class="main-content">
+            <h1>Welcome User To Aura</h1>
+            <p>Aura is a platform for running full stack applications and databases close to your users. We run your code in tiny VMs on our own hardware in 30+ regions around the world.</p>
+            <a href="#" class="cta-button">Get Started</a>
+        </main>
+
+        <section class="terminal-section">
+            <div class="terminal-window">
+                <div class="terminal-header">aura launch</div>
+                <div class="terminal-body">
+                    <pre><span class="command">aura launch</span>
+<span class="output">✓ App detected: ruby-getting-started</span>
+<span class="output">✓ App name: roaring-meadow-1234</span>
+<span class="output">✓ Versions: App: 1, Platform: 2</span>
+<span class="output">✓ Deploying to roaring-meadow-1234</span>
+<span class="output">✓ Monitoring deployment... Done!</span></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <h3>Run Your Code</h3>
+                <p>Bring your Dockerfile, or build on Aura with our buildpacks. Go from `git push` to a globally deployed app in minutes.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Scale Seamlessly</h3>
+                <p>Aura orchestrates your application, scaling it up and down based on traffic and demand, in any of our regions.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Add a Database</h3>
+                <p>Provision and manage Postgres databases. We handle the heavy lifting of replication and failover.</p>
+            </div>
+        </section>
+        
+        <section class="info-section">
+            <div class="info-subsection">
+                <h2>Trusted By The Best</h2>
+                <div class="logo-grid">
+                    <div class="logo-item">TechCorp</div>
+                    <div class="logo-item">Innovate Inc.</div>
+                    <div class="logo-item">DataWave</div>
+                    <div class="logo-item">QuantumLeap</div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2025 Aura. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- This container holds the SIGN-IN page -->
+    <div id="signInPage" class="form-container">
+        <h2>Sign in to Aura</h2>
+        <form id="signInForm">
+            <div class="form-group">
+                <label for="email-signin">Email address</label>
+                <input type="email" id="email-signin" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password-signin">Password</label>
+                <input type="password" id="password-signin" name="password" required>
+            </div>
+            <button type="submit" class="submit-button">Sign In</button>
+        </form>
+        <div class="social-signin">
+            <p>Or sign in with</p>
+            <button class="social-button">Sign in with Google</button>
+        </div>
+        <div class="back-to-home">
+            <a class="backToHomeLink">← Back to Home</a>
+        </div>
+    </div>
+
+    <!-- This container holds the LOG-IN page -->
+    <div id="logInPage" class="form-container">
+        <h2>Log in to Aura</h2>
+        <form id="logInForm">
+            <div class="form-group">
+                <label for="email-login">Email address</label>
+                <input type="email" id="email-login" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password-login">Password</label>
+                <input type="password" id="password-login" name="password" required>
+            </div>
+            <button type="submit" class="submit-button">Log In</button>
+        </form>
+        <div class="social-signin">
+            <p>Or log in with</p>
+            <button class="social-button">Log in with Google</button>
+        </div>
+        <div class="back-to-home">
+            <a class="backToHomeLink">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript for Page Navigation ---
+        const mainPage = document.getElementById('mainPage');
+        const signInPage = document.getElementById('signInPage');
+        const logInPage = document.getElementById('logInPage');
+
+        const signInLink = document.getElementById('signInLink');
+        const logInLink = document.getElementById('logInLink');
+        const logo = document.getElementById('logo');
+        const backToHomeLinks = document.querySelectorAll('.backToHomeLink');
+
+        function showMainPage() {
+            mainPage.style.display = 'block';
+            signInPage.style.display = 'none';
+            logInPage.style.display = 'none';
+        }
+
+        function showSignInPage() {
+            mainPage.style.display = 'none';
+            signInPage.style.display = 'block';
+            logInPage.style.display = 'none';
+        }
+
+        function showLogInPage() {
+            mainPage.style.display = 'none';
+            signInPage.style.display = 'none';
+            logInPage.style.display = 'block';
+        }
+
+        // --- Event Listeners ---
+        signInLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            showSignInPage();
+        });
+        
+        logInLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            showLogInPage();
+        });
+
+        logo.addEventListener('click', function(event) {
+            event.preventDefault();
+            showMainPage();
+        });
+
+        backToHomeLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                showMainPage();
+            });
+        });
+
+        document.getElementById('signInForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            alert('This is a demo sign-in form.');
+        });
+        
+        document.getElementById('logInForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            alert('This is a demo log-in form.');
+        });
+
+        document.addEventListener('DOMContentLoaded', showMainPage);
+    </script>
+
+</body>
+</html>
