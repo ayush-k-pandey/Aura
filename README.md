@@ -1,3 +1,83 @@
+## Step 1: Start Your Main Server
+This is the most important step. You are no longer running any temporary test files. You are running the final application.
+Make sure your virtual environment is activated (source .venv/bin/activate).
+In your terminal, from the aura-backend directory, run the main app.py file:
+code
+```bash
+python app.py
+```
+You should see all the "Loading model..." and "Initializing..." messages, followed by a line confirming the server is running on port 5000.
+code
+```Code
+* Running on http://127.0.0.1:5000
+```
+Your backend is now live and waiting.
+## Step 2: Use curl to Act Like the Frontend
+Open a new, separate terminal window. (Do not close the one where the server is running).
+This new terminal is your "testing ground." You will send different curl commands to see how the AI core responds to different user inputs.
+Here are a few scenarios to test.
+Test Case 1: A Simple Meal
+Goal: See if the NLP, prediction, and recommendation work for a standard meal.
+Run this command:
+code
+```Bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+        "message": "I am having a sandwich and an apple for lunch"
+      }' \
+  http://127.0.0.1:5000/api/chat
+```
+What to look for in the response:
+parsed_info.carbs should be around 55.
+dose_recommendation should give a reasonable dose for that carb amount.
+glucose_prediction.adjusted_prediction should show a gentle rise in glucose.
+Test Case 2: A Meal with Exercise
+Goal: Verify that the "hybrid" model logic is working and that the exercise context is being used.
+Run this command:
+code
+```Bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+        "message": "just ate a bowl of pasta and am going for a 45 minute walk"
+      }' \
+  http://127.0.0.1:5000/api/chat
+```
+What to look for in the response:
+parsed_info should detect both "pasta" and "walk".
+dose_recommendation.reasoning should include the phrase "Adjusted for recent exercise."
+contextual_advice.exercise_reduction should be true.
+glucose_prediction.adjusted_prediction should show a much flatter curve than a meal alone would.
+Test Case 3: An Explicit Carb Amount
+Goal: Check if the NLP correctly prioritizes a user's specific carb count.
+Run this command:
+code
+Bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+        "message": "dinner was about 80g of carbs"
+      }' \
+  http://127.0.0.1:5000/api/chat
+What to look for in the response:
+parsed_info.carbs should be exactly 80.
+parsed_info.warnings should contain the message: "Used explicit carb amount, ignoring food estimates".
+Test Case 4: Just an Activity
+Goal: Ensure the system handles non-meal logs gracefully.
+Run this command:
+code
+Bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+        "message": "finished a tough workout at the gym"
+      }' \
+  http://127.0.0.1:5000/api/chat
+What to look for in the response:
+parsed_info.carbs should be 0.
+parsed_info.activities_detected should correctly identify the "gym" workout.
+dose_recommendation.recommended_dose should likely be 0.0.
 # 🌟 Project Aura: The Ultimate Diabetes Command Center
 
 > *A responsive web application that transforms the daily cognitive burden of diabetes into a proactive, predictive, and seamless experience*
