@@ -62,42 +62,79 @@ def login():
 # In app.py
 
 # ... (keep all other code the same) ...
-
 # ==================================================================
-# === THE PRIMARY AI ENDPOINT (with Debugging Fallback) ============
+# === THE PRIMARY AI ENDPOINT (FINAL DEBUG VERSION) ================
 # ==================================================================
 @app.route("/api/chat", methods=['POST'])
 def handle_chat_intent():
-    print("\n--- Received request at /api/chat ---")
+    print("\n" + "="*50)
+    print("--- Received request at /api/chat ---")
     data = request.get_json()
     
     user_message = data.get('message')
     user_id = data.get('user_id')
 
     if not user_message or not user_id:
+        print("--- [ERROR] Request is missing 'message' or 'user_id'. ---")
         return jsonify({"error": "A 'message' and 'user_id' are required"}), 400
         
-    # --- Step 1: Attempt to get REAL data from the database ---
+    print(f"--- [INPUT] User ID: {user_id}, Message: '{user_message}'")
+    
+    # --- Step 1: Get Glucose History ---
     glucose_history = db.get_recent_glucose_readings(user_id, limit=12)
-    print(f"--- [Database] Found {len(glucose_history)} readings for user {user_id}. ---")
-
-    # --- Step 2: THE FOOLPROOF HACKATHON FIX ---
-    # If the database returns nothing (because the simulator might have a bug),
-    # we will use a reliable mock list to ensure the demo works.
     if not glucose_history or len(glucose_history) < 12:
-        print("--- [Fallback] Database returned insufficient data. Using mock history for AI demo. ---")
+        print(f"--- [DATA] Found only {len(glucose_history)} readings. Using fallback mock data for AI. ---")
         glucose_history = [120, 122, 125, 126, 128, 129, 130, 131, 130, 128, 126, 124]
-    
-    print(f"-> User Message: '{user_message}'")
-    
-    # This will now ALWAYS have valid data to work with
+    else:
+        print(f"--- [DATA] Found {len(glucose_history)} recent glucose readings. ---")
+
+    # --- Step 2: Call the AI Core ---
+    print("--- [AI] Calling 'process_user_intent'... ---")
     ai_response = process_user_intent(
-    user_id=user_id, # <-- ADD THIS LINE
-    user_text=user_message,
-    glucose_history=glucose_history
-)
+        user_id=user_id,
+        user_text=user_message,
+        glucose_history=glucose_history
+    )
     
-    print("--- AI Core processed intent successfully ---")
+    # --- !! CRITICAL DEBUGGING STEP !! ---
+    # We will now print the entire raw response from the AI to see exactly what it contains.
+    import json
+    print("--- [AI] Raw response from AI Core:")
+    print(json.dumps(ai_response, indent=2))
+    # ----------------------------------------
+
+    # --- Step 3: Save Detected Meals to Database ---
+    print("--- [DATABASE] Checking AI response for meals to save... ---")
+    try:
+        # More robust check: ensure keys exist before accessing them
+        if "parsed_info" in ai_response and "foods_detected" in ai_response["parsed_info"]:
+            foods_to_log = ai_response["parsed_info"]["foods_detected"]
+            
+            if foods_to_log: # Check if the list is not empty
+                print(f"--- [DATABASE] Found {len(foods_to_log)} food item(s). Proceeding to save. ---")
+                for food_item in foods_to_log:
+                    description = f"{food_item.get('quantity', 1)}x {food_item.get('food', 'Unknown Food')}"
+                    carb_value = food_item.get('carbs', 0)
+                    
+                    print(f"--- [DATABASE] Saving: User='{user_id}', Desc='{description}', Carbs='{carb_value}'")
+                    db.add_log_entry(
+                        user_id=int(user_id),
+                        log_type='meal',
+                        description=description,
+                        value=carb_value
+                    )
+                print("--- [DATABASE] All detected meals have been saved. ---")
+            else:
+                print("--- [DATABASE] 'foods_detected' list was empty. Nothing to save. ---")
+        else:
+            print("--- [DATABASE] 'parsed_info' or 'foods_detected' key not found in AI response. Nothing to save. ---")
+            
+    except Exception as e:
+        print(f"--- [DATABASE] CRITICAL ERROR during save process. The AI response was processed, but saving failed. ---")
+        print(f"--- [DATABASE] Error details: {e} ---")
+    
+    print("--- AI Core processed intent successfully. Returning response to frontend. ---")
+    print("="*50 + "\n")
     return jsonify(ai_response)
 # ==================================================================
 # === NEW: AI CALIBRATION ENDPOINT =================================
