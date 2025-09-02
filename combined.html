@@ -523,43 +523,82 @@
         chatHistory.scrollTop = chatHistory.scrollHeight;
       }
 
-      function applyAiResponseToUI(aiResponse) {
-        const {
-          parsed_info,
-          dose_recommendation,
-          glucose_prediction,
-          contextual_advice,
-        } = aiResponse;
+      // In combined.html, replace the old function with this one
 
-        if (parsed_info) {
-          document.getElementById("carbs-value").innerText = `${
-            parsed_info.carbs ?? "—"
-          }g`;
-        }
-        if (dose_recommendation) {
-          document.getElementById("dose-value").innerText = `${
-            dose_recommendation.recommended_dose ?? "—"
-          }u`;
-          document.getElementById("dose-reason").innerText =
-            dose_recommendation.reasoning ?? "";
-        }
-        if (glucose_prediction) {
-          document.getElementById("trend-value").innerText =
-            glucose_prediction.length ? "Predicting..." : "Stable";
-        }
+// In combined.html, replace the old function with this one
 
-        const adviceLines = [];
-        if (contextual_advice) {
-          if (contextual_advice.exercise_reduction) {
-            adviceLines.push(
-              `I see you're exercising. Consider reducing your dose by <b>${contextual_advice.exercise_reduction_percent}%</b> to avoid a low.`
-            );
-          }
+function applyAiResponseToUI(aiResponse) {
+    console.log("Applying AI Response to UI:", aiResponse);
+
+    const {
+      parsed_info,
+      dose_recommendation,
+      glucose_prediction,
+      contextual_advice,
+    } = aiResponse;
+
+    // --- Update Dashboard Cards (this part is working well) ---
+    const carbsEl = document.getElementById("carbs-value");
+    const doseEl = document.getElementById("dose-value");
+    const reasonEl = document.getElementById("dose-reason");
+    const trendEl = document.getElementById("trend-value");
+
+    if (parsed_info && typeof parsed_info.carbs !== 'undefined') {
+        carbsEl.innerText = `${parsed_info.carbs}g`;
+    } else { carbsEl.innerText = "—"; }
+
+    if (dose_recommendation && typeof dose_recommendation.recommended_dose !== 'undefined') {
+        doseEl.innerText = `${dose_recommendation.recommended_dose}u`;
+        if (dose_recommendation.reasoning_components) {
+            reasonEl.innerText = dose_recommendation.reasoning_components.final_summary;
+        } else {
+            reasonEl.innerText = dose_recommendation.reasoning || "";
         }
-        if (adviceLines.length > 0) {
-          pushMessage("aura", adviceLines.join("<br>"));
+    } else {
+        doseEl.innerText = "—";
+        reasonEl.innerText = "";
+    }
+    
+    if (glucose_prediction && glucose_prediction.analysis && glucose_prediction.analysis.trend) {
+        trendEl.innerText = glucose_prediction.analysis.trend;
+    } else {
+        trendEl.innerText = "N/A";
+    }
+
+    // --- NEW AND IMPROVED CHATBOT RESPONSE LOGIC ---
+    let botReply = "";
+
+    // 1. Acknowledge the user's input
+    if (parsed_info.carbs > 0 && parsed_info.activities_detected.length > 0) {
+        botReply = `Okay, I've logged your meal of ${parsed_info.carbs}g and your workout. `;
+    } else if (parsed_info.carbs > 0) {
+        botReply = `Got it. Logged a meal of ${parsed_info.carbs}g. `;
+    } else if (parsed_info.activities_detected.length > 0) {
+        botReply = `Great job on the workout! I've logged it for you. `;
+    } else {
+        botReply = "I've logged your entry. ";
+    }
+
+    // 2. Give the most important piece of advice: the dose
+    if (dose_recommendation && dose_recommendation.recommended_dose > 0) {
+        botReply += `Based on this, my suggested dose is <b>${dose_recommendation.recommended_dose} units</b>.`;
+    } else {
+        botReply += "No insulin dose seems necessary right now.";
+    }
+    
+    // 3. Add any extra warnings or advice from the contextual engine
+    if (contextual_advice) {
+        if (contextual_advice.exercise_reduction) {
+            botReply += `<br><br><b>Heads up:</b> Since you're exercising, you should consider reducing that dose by about <b>${contextual_advice.exercise_reduction_percent}%</b> to avoid going low.`;
         }
-      }
+        if (contextual_advice.timing_considerations && contextual_advice.timing_considerations.length > 0) {
+            botReply += `<br><br><i>Note: ${contextual_advice.timing_considerations[0]}</i>`;
+        }
+    }
+
+    // Push the complete, intelligent message to the chat
+    pushMessage("aura", botReply);
+}
 
       // --- API CALLS ---
       async function callApi(endpoint, options = {}) {
@@ -710,6 +749,7 @@
       });
 
       sendBtn.addEventListener("click", async () => {
+        console.log("Send button clicked!"); // <-- ADD THIS LINE
         const text = chatInput.value.trim();
         if (!text || !currentUserId) return;
         pushMessage("user", text);
@@ -727,9 +767,9 @@
             `/api/dashboard?user_id=${currentUserId}`
           );
           updateChart(
-            historicalData.glucose_readings || [],
-            aiResponse.glucose_prediction || []
-          );
+    historicalData.glucose_readings || [],
+    aiResponse.glucose_prediction.adjusted_prediction || [] 
+);
         } catch (error) {
           pushMessage(
             "aura",
