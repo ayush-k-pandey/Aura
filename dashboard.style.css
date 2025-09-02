@@ -1,0 +1,156 @@
+/* --- CSS Variables for Easy Theme Management --- */
+:root {
+    --background-color: #000;
+    --surface-color: #141414; /* Slightly lighter than black for cards */
+    --border-color: #333;
+    --primary-text-color: #fff;
+    --secondary-text-color: #a3a3a3;
+    --accent-color: #00f5a0; /* Bright green from your coworker's terminal */
+}
+
+/* --- Main Body and Layout Styling --- */
+body {
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    color: var(--primary-text-color);
+    background-color: var(--background-color);
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Sidebar Styling --- */
+.sidebar {
+    width: 250px;
+    background-color: var(--background-color);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+.sidebar-header .logo {
+    font-weight: 700;
+    font-size: 1.75rem;
+    padding-left: 0.5rem;
+}
+.sidebar-nav {
+    margin-top: 2rem;
+    flex-grow: 1; /* Pushes the footer down */
+}
+.nav-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--secondary-text-color);
+    font-weight: 500;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+.nav-item:hover {
+    background-color: var(--surface-color);
+    color: var(--primary-text-color);
+}
+.nav-item.active {
+    background-color: var(--surface-color);
+    color: var(--primary-text-color);
+    font-weight: 600;
+}
+.sidebar-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- Main Content Area Styling --- */
+.main-content {
+    flex: 1;
+    padding: 2rem 3rem;
+    overflow-y: auto;
+}
+.main-header h2 {
+    font-size: 2rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+}
+.main-header p {
+    color: var(--secondary-text-color);
+    margin: 0 0 2.5rem 0;
+}
+
+/* --- Widgets and Cards Grid --- */
+.widgets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3-column grid */
+    gap: 1.5rem;
+}
+.card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+.card h3 {
+    margin-top: 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+.chart-card {
+    grid-column: span 2; /* Make the chart take up 2 columns */
+}
+.full-width {
+    grid-column: span 3; /* Make activity list take full width */
+}
+.chart-container {
+    height: 350px;
+    position: relative; /* Needed for Chart.js responsiveness */
+}
+
+/* --- Specific Widget Styles --- */
+.stat {
+    margin-bottom: 1.5rem;
+}
+.stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+.stat-label {
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+}
+.action-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: var(--primary-text-color);
+    color: var(--background-color);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.activity-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.activity-list li:last-child {
+    border-bottom: none;
+}
+.activity-list .time {
+    color: var(--secondary-text-color);
+}
+.activity-list .value {
+    font-weight: 600;
+}

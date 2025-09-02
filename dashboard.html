@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Dashboard</title>
+    
+    <!-- We are linking to the same font your coworker used -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    
+    <!-- Link to our new CSS file -->
+    <link rel="stylesheet" href="dashboard.style.css">
+    
+    <!-- The Chart.js library for drawing our beautiful chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">Aura</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="#" class="nav-item">History</a>
+                <a href="#" class="nav-item">Recommendations</a>
+                <a href="#" class="nav-item">Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item">Log Out</a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <header class="main-header">
+                <h2>Welcome Back, User!</h2>
+                <p>Here is your glucose summary and prediction.</p>
+            </header>
+
+            <div class="widgets-grid">
+                <!-- WIDGET 1: THE CHART (YOUR MASTERPIECE) -->
+                <div class="card chart-card">
+                    <h3>Glucose Trend (mg/dL)</h3>
+                    <div class="chart-container">
+                        <!-- The chart will be drawn here by JavaScript -->
+                        <canvas id="glucoseChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- WIDGET 2: KEY STATS -->
+                <div class="card">
+                    <h3>Current Status</h3>
+                    <div class="stat">
+                        <span class="stat-value">112</span>
+                        <span class="stat-label">Current Glucose</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">Stable</span>
+                        <span class="stat-label">Short-Term Trend</span>
+                    </div>
+                    <button class="action-button">Get New Recommendation</button>
+                </div>
+                
+                <!-- WIDGET 3: RECENT LOGS -->
+                <div class="card full-width">
+                    <h3>Recent Activity</h3>
+                    <ul class="activity-list">
+                        <li><span class="time">08:00 AM</span> Measured Glucose: <span class="value">105 mg/dL</span></li>
+                        <li><span class="time">08:05 AM</span> Logged Meal: <span class="value">45g Carbs</span></li>
+                        <li><span class="time">08:07 AM</span> Administered Dose: <span class="value">4.5 units</span></li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Link to our JavaScript file at the end -->
+    <script src="dashboard.script.js" defer></script>
+</body>
+</html>
