@@ -8,3 +8,16 @@ stable-baselines3[extra]
 simglucose
 joblib
 flask
+Flask
+Flask-Cors
+gunicorn
+psycopg2-binary
+Werkzeug
+numpy
+tensorflow
+keras
+scikit-learn
+joblib
+stable-baselines3
+torch
+spacy
