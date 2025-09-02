@@ -3,7 +3,8 @@ pandas
 scikit-learn
 tensorflow
 keras
-gymnasium # Changed from gym==0.21.0
+gymnasium 
 stable-baselines3[extra]
 simglucose
 joblib
+flask
