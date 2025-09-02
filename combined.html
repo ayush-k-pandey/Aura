@@ -13,22 +13,29 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        /* --- CSS Variables for Easy Theme Management --- */
+        :root {
+            --background-color: #F3F4F6; /* Light Gray */
+            --surface-color: #FFFFFF; /* White for cards */
+            --border-color: #E2E8F0;
+            --primary-text-color: #1E293B; /* Dark Navy */
+            --secondary-text-color: #64748B; /* Medium Gray */
+            --accent-color: #7C3AED; /* Vibrant Purple */
+            --accent-light-color: #F5F3FF; /* Light Purple for active nav */
+        }
+
         /* --- General Styling & Light Theme --- */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            color: #1E293B;
-            background-color: #F3F4F6;
+            color: var(--primary-text-color);
+            background-color: var(--background-color);
             overflow-x: hidden;
             transition: background-color 0.3s ease;
         }
 
-        body.form-view-active {
-            background: #181818;
-        }
-
         /* --- Header and Navigation --- */
-        header {
+        header#mainHeader {
             position: relative;
             z-index: 50;
             display: flex;
@@ -64,426 +71,109 @@
             border-radius: 9999px;
         }
         nav a:hover {
-            color: #7C3AED;
+            color: var(--accent-color);
             background-color: rgba(237, 233, 254, 0.5);
         }
 
         /* --- Hero Section --- */
         .hero-section {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 6rem 2rem 18rem;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #f3f4f6, white);
+            position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            padding: 6rem 2rem 18rem; overflow: hidden; background: linear-gradient(to bottom, #f3f4f6, white);
         }
-        .hero-background {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 1500px;
-            max-width: none;
-            z-index: 0;
-        }
-        .hero-content {
-            position: relative;
-            z-index: 1;
-        }
-        .hero-content h1 {
-            font-family: 'Lora', serif;
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            line-height: 1.15;
-        }
-        .hero-content h1 .underline {
-            position: relative;
-            display: inline-block;
-        }
-        .hero-content h1 .underline::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: -5%;
-            right: -5%;
-            height: 10px;
-            background: linear-gradient(90deg, #CA7FF8, #795BE9);
-            z-index: -1;
-            border-radius: 2px;
-        }
-        .hero-content p {
-            font-size: 1.25rem;
-            color: #475569;
-            margin: 0 auto 2.5rem;
-            max-width: 600px;
-            line-height: 1.6;
-        }
-        .cta-button {
-            background-color: #7C3AED;
-            color: #fff;
-            padding: 1rem 2rem;
-            border-radius: 9999px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .cta-button:hover {
-            background-color: #6D28D9;
-        }
+        .hero-background { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 1500px; max-width: none; z-index: 0; }
+        .hero-content { position: relative; z-index: 1; }
+        .hero-content h1 { font-family: 'Lora', serif; font-size: 4rem; margin-bottom: 1.5rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1.15; }
+        .hero-content p { font-size: 1.25rem; color: #475569; margin: 0 auto 2.5rem; max-width: 600px; line-height: 1.6; }
+        .cta-button { background-color: var(--accent-color); color: #fff; padding: 1rem 2rem; border-radius: 9999px; text-decoration: none; font-weight: 600; transition: background-color 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .cta-button:hover { background-color: #6D28D9; }
 
         /* --- Features & Info Sections --- */
-        .content-section {
-            background-color: white;
-            padding: 4rem 2rem;
-        }
-        .section-container {
-            max-width: 1024px;
-            margin: 0 auto;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-        .feature-card {
-            background-color: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-        }
-        .feature-card h3 {
-            font-family: 'Lora', serif;
-            font-size: 1.5rem;
-            margin-top: 0;
-            color: #1E293B;
-        }
-        .feature-card p {
-            color: #475569;
-            line-height: 1.6;
-        }
-        .info-section {
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-        .info-section h2 {
-            font-family: 'Lora', serif;
-            font-size: 2.5rem;
-            color: #1E293B;
-            margin-bottom: 3rem;
-        }
-        .logo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .logo-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #64748B;
-        }
-        .info-subsection {
-            margin-bottom: 5rem;
-        }
+        .content-section { background-color: var(--surface-color); padding: 4rem 2rem; }
+        .section-container { max-width: 1024px; margin: 0 auto; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .feature-card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 1rem; padding: 2rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); }
+        .feature-card h3 { font-family: 'Lora', serif; font-size: 1.5rem; margin-top: 0; color: var(--primary-text-color); }
+        .feature-card p { color: #475569; line-height: 1.6; }
+        .info-section { padding: 4rem 2rem; text-align: center; }
+        .info-section h2 { font-family: 'Lora', serif; font-size: 2.5rem; color: var(--primary-text-color); margin-bottom: 3rem; }
+        .logo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; max-width: 900px; margin: 0 auto; }
+        .logo-item { display: flex; justify-content: center; align-items: center; background-color: #F8FAFC; border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1.5rem; font-size: 1.2rem; font-weight: 600; color: var(--secondary-text-color); }
 
         /* --- Footer --- */
-        footer {
-            text-align: center;
-            padding: 4rem 2rem;
-            background-color: #0F172A;
-            color: #94A3B8;
-        }
+        footer { text-align: center; padding: 4rem 2rem; background-color: #0F172A; color: #94A3B8; }
         
-        /* --- Sign-in & Log-in Page Styles --- */
-        .form-page-wrapper {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 5vh;
-        }
-        .form-logo {
-            font-weight: 700;
-            font-size: 2.5rem;
-            color: #fff;
-            margin-bottom: 2rem;
-        }
-        .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 2.5rem;
-            background-color: #222;
-            border: 1px solid #333;
-            border-radius: 0.75rem;
-            box-sizing: border-box;
-        }
-        .form-container h2 {
-            text-align: center;
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 2rem;
-            color: #fff;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #A1A1AA;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #555;
-            border-radius: 0.5rem;
-            background-color: #181818;
-            color: #fff;
-            box-sizing: border-box;
-        }
-        .submit-button {
-            width: 100%;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 0.5rem;
-            background-color: #333;
-            color: #fff;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .submit-button:hover {
-            background-color: #444;
-        }
-        .separator {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: #666;
-            margin: 1.5rem 0;
-        }
-        .separator::before, .separator::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #444;
-        }
-        .separator:not(:empty)::before {
-            margin-right: .5em;
-        }
-        .separator:not(:empty)::after {
-            margin-left: .5em;
-        }
-        .social-button {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 0.5rem;
-            background-color: #ffffff;
-            color: #000;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .social-button:hover {
-            background-color: #f0f0f0;
-        }
-        .form-footer {
-            text-align: center;
-            margin-top: 2rem;
-        }
-        .form-footer a {
-            color: #A1A1AA;
-            text-decoration: none;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .form-footer a:hover {
-            color: #fff;
-        }
+        /* --- Form Page Styles (Light Theme) --- */
+        .form-page-wrapper { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .form-logo { font-weight: 700; font-size: 2.5rem; color: var(--primary-text-color); margin-bottom: 2rem; }
+        .form-container { width: 100%; max-width: 400px; padding: 2.5rem; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.75rem; box-sizing: border-box; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .form-container h2 { text-align: center; font-size: 1.5rem; margin-top: 0; margin-bottom: 2rem; color: var(--primary-text-color); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--secondary-text-color); }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; background-color: #F9FAFB; color: var(--primary-text-color); box-sizing: border-box; }
+        .submit-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; background-color: var(--accent-color); color: #fff; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+        .submit-button:hover { background-color: #6D28D9; }
+        .separator { display: flex; align-items: center; text-align: center; color: #9CA3AF; margin: 1.5rem 0; }
+        .separator::before, .separator::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
+        .separator:not(:empty)::before { margin-right: .5em; }
+        .separator:not(:empty)::after { margin-left: .5em; }
+        .social-button { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background-color: var(--surface-color); color: var(--primary-text-color); margin-bottom: 0.5rem; cursor: pointer; font-weight: 600; transition: background-color 0.2s; }
+        .social-button:hover { background-color: #f9fafb; }
+        .form-footer a { color: var(--secondary-text-color); text-decoration: none; font-size: 0.9rem; cursor: pointer; }
+        .form-footer a:hover { color: var(--primary-text-color); }
 
         /* --- DASHBOARD STYLES --- */
-        :root {
-            --background-color: #000;
-            --surface-color: #141414;
-            --border-color: #333;
-            --primary-text-color: #fff;
-            --secondary-text-color: #a3a3a3;
-            --accent-color: #00f5a0;
-        }
-        .dashboard-container {
+        .dashboard-header {
             display: flex;
-            min-height: 100vh;
-            color: var(--primary-text-color);
-            background-color: var(--background-color);
-        }
-        .sidebar {
-            width: 250px;
-            background-color: var(--background-color);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-        }
-        .sidebar-header .logo {
-            font-weight: 700;
-            font-size: 1.75rem;
-            padding-left: 0.5rem;
-        }
-        .sidebar-nav {
-            margin-top: 2rem;
-            flex-grow: 1;
-        }
-        .nav-item {
-            display: block;
-            padding: 0.75rem 1rem;
-            text-decoration: none;
-            color: var(--secondary-text-color);
-            font-weight: 500;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            transition: all 0.2s ease-in-out;
-        }
-        .nav-item:hover {
+            align-items: center;
+            padding: 0 2rem;
             background-color: var(--surface-color);
-            color: var(--primary-text-color);
-        }
-        .nav-item.active {
-            background-color: var(--surface-color);
-            color: var(--primary-text-color);
-            font-weight: 600;
-        }
-        .sidebar-footer {
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
-        .main-content {
-            flex: 1;
-            padding: 2rem 3rem;
-            overflow-y: auto;
-        }
-        .main-header h2 {
-            font-size: 2rem;
-            margin: 0 0 0.5rem 0;
-            font-weight: 700;
-        }
-        .main-header p {
-            color: var(--secondary-text-color);
-            margin: 0 0 2.5rem 0;
-        }
-        .widgets-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }
-        .card {
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-        }
-        .card h3 {
-            margin-top: 0;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
+            height: 70px;
         }
-        .chart-card {
-            grid-column: span 2;
-        }
-        .full-width {
-            grid-column: span 3;
-        }
-        .chart-container {
-            height: 350px;
-            position: relative;
-        }
-        .stat {
-            margin-bottom: 1.5rem;
-        }
-        .stat-value {
-            display: block;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent-color);
-        }
-        .stat-label {
-            color: var(--secondary-text-color);
-            font-size: 0.9rem;
-        }
-        .action-button {
-            width: 100%;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 0.5rem;
-            background-color: var(--primary-text-color);
-            color: var(--background-color);
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .activity-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .activity-list li {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .activity-list li:last-child {
-            border-bottom: none;
-        }
-        .activity-list .time {
-            color: var(--secondary-text-color);
-        }
-        .activity-list .value {
-            font-weight: 600;
-        }
+        .dashboard-header .logo { font-size: 1.75rem; }
+        .dashboard-nav { display: flex; margin-left: 2rem; flex-grow: 1; }
+        .dashboard-nav a.nav-item { margin: 0; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; border-radius: 0; color: var(--secondary-text-color); }
+        .dashboard-nav a.nav-item:hover { color: var(--primary-text-color); background: none; }
+        .dashboard-nav a.nav-item.active { color: var(--accent-color); border-bottom-color: var(--accent-color); background: none; }
+        .user-actions { margin-left: auto; }
+        .user-actions .nav-item { color: var(--secondary-text-color); }
+        .user-actions .nav-item:hover { color: var(--accent-color); background: none; }
+        .main-content { padding: 2rem 3rem; }
+        .main-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+        .main-header h2 { font-size: 1.75rem; margin: 0; font-weight: 700; }
+        .main-header p { color: var(--secondary-text-color); margin: 0; padding-top: 0.25rem; }
+        .widgets-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start; }
+        .card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1.5rem; }
+        .card h3 { margin-top: 0; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .stat { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .stat:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent-color); }
+        .stat-label { color: var(--secondary-text-color); font-size: 0.9rem; }
+        .action-button { width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; background-color: var(--primary-text-color); color: var(--surface-color); font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 1.5rem; }
+        .activity-list { list-style: disc; padding-left: 1.25rem; margin: 0; }
+        .activity-list li { padding: 0.5rem 0; color: var(--secondary-text-color); }
+        .activity-list .value { color: var(--primary-text-color); font-weight: 500; }
+
+        /* --- Chat Styles --- */
+        .chat-icon-button { position: fixed; bottom: 2rem; right: 2rem; width: 60px; height: 60px; background-color: var(--accent-color); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; }
+        .chat-page { display: none; flex-direction: column; height: 100vh; width: 100%; background-color: var(--background-color); }
+        .chat-header { display: flex; align-items: center; padding: 1rem 1.5rem; background-color: var(--surface-color); border-bottom: 1px solid var(--border-color); }
+        .chat-header .back-button { background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-right: 1rem; }
+        .chat-header h2 { margin: 0; font-size: 1.25rem; }
+        .chat-messages { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+        .message { margin-bottom: 1rem; max-width: 75%; padding: 0.75rem 1rem; border-radius: 1rem; }
+        .user-message { background-color: var(--accent-color); color: white; margin-left: auto; border-bottom-right-radius: 0; }
+        .bot-message { background-color: var(--surface-color); border: 1px solid var(--border-color); margin-right: auto; border-bottom-left-radius: 0; }
+        .chat-input-form { display: flex; padding: 1rem; background-color: var(--surface-color); border-top: 1px solid var(--border-color); }
+        .chat-input-form input { flex-grow: 1; border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 0.5rem; margin-right: 0.5rem; }
+        .chat-input-form button { padding: 0.75rem 1.5rem; border: none; background-color: var(--accent-color); color: white; border-radius: 0.5rem; cursor: pointer; }
 
         @media (max-width: 768px) {
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            nav {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .widgets-grid {
-                grid-template-columns: 1fr; /* Stack widgets on smaller screens */
-            }
-            .chart-card, .full-width {
-                grid-column: span 1; /* Reset column spans */
-            }
-            .dashboard-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
+            .hero-content h1 { font-size: 2.5rem; }
+            nav { flex-wrap: wrap; justify-content: center; }
+            .widgets-grid { grid-template-columns: 1fr; }
+            .dashboard-header { flex-direction: column; height: auto; padding: 1rem; }
+            .dashboard-nav { margin: 1rem 0 0 0; }
         }
     </style>
 </head>
@@ -491,26 +181,16 @@
 
     <header id="mainHeader">
         <div class="logo" id="logo">Aura</div>
-        <nav>
-            <a href="#">Pricing</a>
-            <a href="#">Docs</a>
-            <a href="#">Community</a>
-            <a id="logInLink">Log In</a>
-            <a id="signInLink">Sign In</a>
-        </nav>
+        <nav><a href="#">Pricing</a><a href="#">Docs</a><a href="#">Community</a><a id="logInLink">Log In</a><a id="signInLink">Sign In</a></nav>
     </header>
 
     <!-- Main Homepage Container -->
     <div id="mainPage">
-        <!-- ... (Your existing homepage content) ... -->
         <section class="hero-section">
             <div class="hero-content">
-                <h1>Welcome <span class="underline">User</span> To Aura</h1>
+                <h1>Welcome Users To Aura</h1>
                 <p>Our website helps individuals with diabetes accurately log and track their insulin injection times, sending reminders to avoid missed or duplicate doses. By providing a simple, reliable, and user-friendly platform, it supports safer diabetes management and reduces the risk of overdose or underdosage.</p>
-                <a href="#" class="cta-button">
-                    Get Started
-                    <span>&rarr;</span>
-                </a>
+                <a href="#" class="cta-button">Get Started<span>&rarr;</span></a>
             </div>
             <img src="https://fly.io/phx/ui/images/cloud-city-a61199fec62cd744415fcdf4e1be8434.png?vsn=d" class="hero-background" alt="Cloud city illustration">
         </section>
@@ -518,25 +198,16 @@
         <section class="content-section">
             <div class="section-container">
                 <div class="features">
-                    <div class="feature-card">
-                        <h3>Run Your Code</h3>
-                        <p>Bring your Dockerfile, or build on Aura with our buildpacks. Go from `git push` to a globally deployed app in minutes.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Scale Seamlessly</h3>
-                        <p>Aura orchestrates your application, scaling it up and down based on traffic and demand, in any of our regions.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Add a Database</h3>
-                        <p>Provision and manage Postgres databases. We handle the heavy lifting of replication and failover.</p>
-                    </div>
+                    <div class="feature-card"><h3>Run Your Code</h3><p>Bring your Dockerfile, or build on Aura with our buildpacks. Go from `git push` to a globally deployed app in minutes.</p></div>
+                    <div class="feature-card"><h3>Scale Seamlessly</h3><p>Aura orchestrates your application, scaling it up and down based on traffic and demand, in any of our regions.</p></div>
+                    <div class="feature-card"><h3>Add a Database</h3><p>Provision and manage Postgres databases. We handle the heavy lifting of replication and failover.</p></div>
                 </div>
             </div>
         </section>
 
         <section class="info-section">
             <div class="info-subsection">
-                <h2>Created by psuedocoders</div></h2>
+                <h2>created by #psuedocoders</h2>
                 <div class="logo-grid">
                     <div class="logo-item">Ayush pandey</div>
                     <div class="logo-item">swarnim tripathi</div>
@@ -546,115 +217,48 @@
             </div>
         </section>
         
-        <footer>
-            <p>&copy; 2025 Aura. All rights reserved.</p>
-        </footer>
+        <footer><p>&copy; 2025 Aura. All rights reserved.</p></footer>
     </div>
 
-    <!-- Sign-In Page Container -->
-    <div id="signInPage" class="form-page-wrapper">
-        <div class="form-logo">Aura</div>
-        <div class="form-container">
-            <h2>Sign in to Aura</h2>
-            <button class="social-button">Sign in with Google</button>
-            <div class="separator">or</div>
-            <form id="signInForm">
-                <div class="form-group">
-                    <label for="email-signin">Email address</label>
-                    <input type="email" id="email-signin" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password-signin">Password</label>
-                    <input type="password" id="password-signin" name="password" required>
-                </div>
-                <button type="submit" class="submit-button">Continue</button>
-            </form>
-            <div class="form-footer">
-                <a class="backToHomeLink">← Back to Home</a>
-            </div>
-        </div>
-    </div>
+    <!-- Sign-In and Log-In Pages (hidden by default) -->
+    <div id="signInPage" class="form-page-wrapper"><div class="form-logo">Aura</div><div class="form-container"><h2>Sign in to Aura</h2><button class="social-button">Sign in with Google</button><div class="separator">or</div><form id="signInForm"><div class="form-group"><label for="email-signin">Email address</label><input type="email" id="email-signin" name="email" required></div><div class="form-group"><label for="password-signin">Password</label><input type="password" id="password-signin" name="password" required></div><button type="submit" class="submit-button">Continue</button></form><div class="form-footer"><a class="backToHomeLink">← Back to Home</a></div></div></div>
+    <div id="logInPage" class="form-page-wrapper"><div class="form-logo">Aura</div><div class="form-container"><h2>Log in to Aura</h2><button class="social-button">Log in with Google</button><div class="separator">or</div><form id="logInForm"><div class="form-group"><label for="email-login">Email address</label><input type="email" id="email-login" name="email" required></div><div class="form-group"><label for="password-login">Password</label><input type="password" id="password-login" name="password" required></div><button type="submit" class="submit-button">Continue</button></form><div class="form-footer"><a class="backToHomeLink">← Back to Home</a></div></div></div>
 
-    <!-- Log-In Page Container -->
-    <div id="logInPage" class="form-page-wrapper">
-        <div class="form-logo">Aura</div>
-        <div class="form-container">
-            <h2>Log in to Aura</h2>
-            <button class="social-button">Log in with Google</button>
-            <div class="separator">or</div>
-            <form id="logInForm">
-                <div class="form-group">
-                    <label for="email-login">Email address</label>
-                    <input type="email" id="email-login" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password-login">Password</label>
-                    <input type="password" id="password-login" name="password" required>
-                </div>
-                <button type="submit" class="submit-button">Continue</button>
-            </form>
-            <div class="form-footer">
-                <a class="backToHomeLink">← Back to Home</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard Page Container -->
+    <!-- Dashboard Page -->
     <div id="dashboardPage" style="display: none;">
-        <div class="dashboard-container">
-            <!-- SIDEBAR NAVIGATION -->
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <h1 class="logo">Aura</h1>
+        <header class="dashboard-header">
+            <h1 class="logo">Aura</h1>
+            <nav class="dashboard-nav">
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="#" class="nav-item">History</a>
+                <a href="#" class="nav-item">Recommendations</a>
+                <a href="#" class="nav-item">Settings</a>
+            </nav>
+            <div class="user-actions">
+                <a href="#" class="nav-item" id="logOutButton">Log Out</a>
+            </div>
+        </header>
+        <main class="main-content">
+            <header class="main-header">
+                <h2>Welcome Back, User!</h2>
+                <p>Here is your glucose summary and prediction.</p>
+            </header>
+            <div class="widgets-grid">
+                <div class="card chart-card"><h3>Glucose Trend (mg/dL)</h3><div class="chart-container"><canvas id="glucoseChart"></canvas></div></div>
+                <div class="card-column">
+                    <div class="card"><h3>Current Status</h3><div class="stat"><span class="stat-label">Current Glucose</span><span class="stat-value">112</span></div><div class="stat"><span class="stat-label">Short-Term Trend</span><span class="stat-value">Stable</span></div><button class="action-button">Get New Recommendation</button></div>
+                    <div class="card"><h3>Recent Activity</h3><ul class="activity-list"><li><span class="time">08:00 AM</span> Measured Glucose: <span class="value">105 mg/dL</span></li><li><span class="time">08:05 AM</span> Logged Meal: <span class="value">45g Carbs</span></li><li><span class="time">08:07 AM</span> Administered Dose: <span class="value">4.5 units</span></li></ul></div>
                 </div>
-                <nav class="sidebar-nav">
-                    <a href="#" class="nav-item active">Dashboard</a>
-                    <a href="#" class="nav-item">History</a>
-                    <a href="#" class="nav-item">Recommendations</a>
-                    <a href="#" class="nav-item">Settings</a>
-                </nav>
-                <div class="sidebar-footer">
-                    <a href="#" class="nav-item" id="logOutButton">Log Out</a>
-                </div>
-            </aside>
+            </div>
+        </main>
+        <button id="chatIcon" class="chat-icon-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
+    </div>
 
-            <!-- MAIN CONTENT AREA -->
-            <main class="main-content">
-                <header class="main-header">
-                    <h2>Welcome Back, User!</h2>
-                    <p>Here is your glucose summary and prediction.</p>
-                </header>
-
-                <div class="widgets-grid">
-                    <div class="card chart-card">
-                        <h3>Glucose Trend (mg/dL)</h3>
-                        <div class="chart-container">
-                            <canvas id="glucoseChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3>Current Status</h3>
-                        <div class="stat">
-                            <span class="stat-value">112</span>
-                            <span class="stat-label">Current Glucose</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-value">Stable</span>
-                            <span class="stat-label">Short-Term Trend</span>
-                        </div>
-                        <button class="action-button">Get New Recommendation</button>
-                    </div>
-                    <div class="card full-width">
-                        <h3>Recent Activity</h3>
-                        <ul class="activity-list">
-                            <li><span class="time">08:00 AM</span> Measured Glucose: <span class="value">105 mg/dL</span></li>
-                            <li><span class="time">08:05 AM</span> Logged Meal: <span class="value">45g Carbs</span></li>
-                            <li><span class="time">08:07 AM</span> Administered Dose: <span class="value">4.5 units</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </main>
-        </div>
+    <!-- Chat Page -->
+    <div id="chatPage" class="chat-page">
+        <header class="chat-header"><button class="back-button" id="backToDashboardButton">&larr;</button><h2>Aura Assistant</h2></header>
+        <div class="chat-messages" id="chatMessages"><div class="message bot-message">Hello! How can I help you today?</div></div>
+        <form class="chat-input-form" id="chatForm"><input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off"><button type="submit">Send</button></form>
     </div>
 
     <script>
@@ -665,57 +269,70 @@
         const signInPage = document.getElementById('signInPage');
         const logInPage = document.getElementById('logInPage');
         const dashboardPage = document.getElementById('dashboardPage');
-
+        const chatPage = document.getElementById('chatPage');
         const signInLink = document.getElementById('signInLink');
         const logInLink = document.getElementById('logInLink');
         const logo = document.getElementById('logo');
         const backToHomeLinks = document.querySelectorAll('.backToHomeLink');
         const logOutButton = document.getElementById('logOutButton');
+        const chatIcon = document.getElementById('chatIcon');
+        const backToDashboardButton = document.getElementById('backToDashboardButton');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
 
-        let glucoseChartInstance = null; // To hold the chart object
+        let glucoseChartInstance = null;
 
-        function showMainPage() {
-            bodyEl.classList.remove('form-view-active');
-            mainHeader.style.display = 'flex';
-            mainPage.style.display = 'block';
+        function hideAllPages() {
+            mainHeader.style.display = 'none';
+            mainPage.style.display = 'none';
             signInPage.style.display = 'none';
             logInPage.style.display = 'none';
             dashboardPage.style.display = 'none';
+            chatPage.style.display = 'none';
+        }
+
+        function showMainPage() {
+            hideAllPages();
+            mainHeader.style.display = 'flex'; mainPage.style.display = 'block';
         }
 
         function showSignInPage() {
-            bodyEl.classList.add('form-view-active');
-            mainHeader.style.display = 'none';
-            mainPage.style.display = 'none';
-            signInPage.style.display = 'flex';
-            logInPage.style.display = 'none';
-            dashboardPage.style.display = 'none';
+            hideAllPages(); signInPage.style.display = 'flex';
         }
 
         function showLogInPage() {
-            bodyEl.classList.add('form-view-active');
-            mainHeader.style.display = 'none';
-            mainPage.style.display = 'none';
-            signInPage.style.display = 'none';
-            logInPage.style.display = 'flex';
-            dashboardPage.style.display = 'none';
+            hideAllPages(); logInPage.style.display = 'flex';
         }
 
         function showDashboardPage() {
-            bodyEl.classList.remove('form-view-active'); // Dashboard has its own dark theme
-            mainHeader.style.display = 'none';
-            mainPage.style.display = 'none';
-            signInPage.style.display = 'none';
-            logInPage.style.display = 'none';
-            dashboardPage.style.display = 'block';
-            initializeDashboard(); // Initialize the chart when the page is shown
+            hideAllPages(); dashboardPage.style.display = 'block'; initializeDashboard();
         }
 
-        // --- DASHBOARD CHART SCRIPT ---
-        function initializeDashboard() {
-            if (glucoseChartInstance) {
-                return; // Prevents re-drawing the chart if it already exists
+        function showChatPage() {
+            hideAllPages(); chatPage.style.display = 'flex';
+        }
+
+        function addMessage(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userMessage = chatInput.value.trim();
+            if (userMessage) {
+                addMessage(userMessage, 'user');
+                chatInput.value = '';
+                setTimeout(() => { addMessage("I am a demo assistant. I'm still learning!", 'bot'); }, 1000);
             }
+        });
+
+        function initializeDashboard() {
+            if (glucoseChartInstance) { glucoseChartInstance.destroy(); }
             const mockData = {
                 labels: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
                 historical: [105, 115, 140, 130, 110, 95, 100, null],
@@ -723,74 +340,21 @@
             };
             const ctx = document.getElementById('glucoseChart').getContext('2d');
             glucoseChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: mockData.labels,
-                    datasets: [
-                        {
-                            label: 'Historical',
-                            data: mockData.historical,
-                            borderColor: '#00f5a0',
-                            backgroundColor: 'rgba(0, 245, 160, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Predicted',
-                            data: mockData.predicted,
-                            borderColor: '#a3a3a3',
-                            borderDash: [5, 5],
-                            fill: false,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            grid: { color: '#333' },
-                            ticks: { color: '#a3a3a3' }
-                        },
-                        x: {
-                            grid: { color: '#333' },
-                            ticks: { color: '#a3a3a3' }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#a3a3a3'
-                            }
-                        }
-                    }
-                }
+                type: 'line', data: { labels: mockData.labels, datasets: [{ label: 'Historical', data: mockData.historical, borderColor: '#7C3AED', backgroundColor: 'rgba(124, 58, 237, 0.1)', fill: true, tension: 0.4 }, { label: 'Predicted', data: mockData.predicted, borderColor: '#94A3B8', borderDash: [5, 5], fill: false, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B' } }, x: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B' } } }, plugins: { legend: { labels: { color: '#64748B' } } } }
             });
         }
 
-        // --- EVENT LISTENERS ---
         signInLink.addEventListener('click', (e) => { e.preventDefault(); showSignInPage(); });
         logInLink.addEventListener('click', (e) => { e.preventDefault(); showLogInPage(); });
         logo.addEventListener('click', (e) => { e.preventDefault(); showMainPage(); });
         logOutButton.addEventListener('click', (e) => { e.preventDefault(); showMainPage(); });
-
-        backToHomeLinks.forEach(link => {
-            link.addEventListener('click', (e) => { e.preventDefault(); showMainPage(); });
-        });
-
-        document.getElementById('signInForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            showDashboardPage();
-        });
-        
-        document.getElementById('logInForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            showDashboardPage();
-        });
-
-        // Initialize the app by showing the main page
+        chatIcon.addEventListener('click', (e) => { e.preventDefault(); showChatPage(); });
+        backToDashboardButton.addEventListener('click', (e) => { e.preventDefault(); showDashboardPage(); });
+        backToHomeLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); showMainPage(); }); });
+        document.getElementById('signInForm').addEventListener('submit', (e) => { e.preventDefault(); showDashboardPage(); });
+        document.getElementById('logInForm').addEventListener('submit', (e) => { e.preventDefault(); showDashboardPage(); });
         document.addEventListener('DOMContentLoaded', showMainPage);
     </script>
 </body>
-</html>
+</html> i want you to chnge the content of the home page the way i have explained you in 1st prompt

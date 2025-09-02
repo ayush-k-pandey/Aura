@@ -9,7 +9,7 @@
 
 ---
 
-## 🎯 Vision
+## 🎯 Visi
 
 **Project Aura is the ultimate command center for diabetes management.** Accessible from any browser on any device, it transforms the daily cognitive burden of diabetes into a proactive, predictive, and seamless experience. By centralizing data, forecasting future trends, and providing personalized AI-driven insights, Aura empowers users to take control of their health with confidence and clarity.
 
