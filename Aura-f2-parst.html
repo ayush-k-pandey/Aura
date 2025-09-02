@@ -4,166 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aura</title>
+    <!-- Importing Google Fonts to mimic fly.io's typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lora:wght@700&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- Main Body and Background Styling --- */
+        /* --- General Styling & New Light Theme --- */
         body {
-            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            color: #fff;
-            background-color: #000;
+            color: #1E293B; /* Dark Navy Text */
+            background-color: #F3F4F6; /* Light Gray Background */
             overflow-x: hidden;
-            position: relative;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('https://fly.io/images/backgrounds/gradient-blur-2.jpg');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.3;
-            z-index: -1;
         }
 
         /* --- Header and Navigation --- */
         header {
+            position: relative;
+            z-index: 50;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1.5rem 2rem;
-            background-color: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            max-width: 1280px;
+            margin: 0 auto;
         }
         .logo {
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             cursor: pointer;
         }
         nav {
             display: flex;
             align-items: center;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 9999px;
+            padding: 0.25rem 0.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
         nav a {
-            margin: 0 1.5rem;
+            margin: 0 0.25rem;
+            padding: 0.5rem 1rem;
             text-decoration: none;
-            color: #a3a3a3;
+            color: #334155;
             cursor: pointer;
             font-weight: 500;
             transition: color 0.2s;
+            border-radius: 9999px;
         }
         nav a:hover {
-            color: #fff;
+            color: #7C3AED; /* Violet hover color */
+            background-color: rgba(237, 233, 254, 0.5);
         }
 
-        /* --- Main Hero Section --- */
-        .main-content {
+        /* --- Hero Section --- */
+        .hero-section {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 6rem 2rem 4rem;
+            padding: 6rem 2rem 18rem; /* Increased padding-bottom for image overlap */
+            overflow: hidden;
+            background: linear-gradient(to bottom, #f3f4f6, white);
         }
-        .main-content h1 {
+        .hero-background {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1500px;
+            max-width: none;
+            z-index: 0;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content h1 {
+            font-family: 'Lora', serif;
             font-size: 4rem;
             margin-bottom: 1.5rem;
             font-weight: 700;
-            letter-spacing: -0.05em;
-            background: -webkit-linear-gradient(45deg, #fff, #a3a3a3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.04em;
+            line-height: 1.15;
         }
-        .main-content p {
+        .hero-content h1 .underline {
+            position: relative;
+            display: inline-block;
+        }
+        /* Decorative underline similar to fly.io */
+        .hero-content h1 .underline::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: -5%;
+            right: -5%;
+            height: 10px;
+            background: linear-gradient(90deg, #CA7FF8, #795BE9);
+            z-index: -1;
+            border-radius: 2px;
+        }
+        .hero-content p {
             font-size: 1.25rem;
-            color: #a3a3a3;
+            color: #475569;
             margin: 0 auto 2.5rem;
             max-width: 600px;
             line-height: 1.6;
         }
         .cta-button {
-            background-color: #fff;
-            color: #000;
+            background-color: #7C3AED;
+            color: #fff;
             padding: 1rem 2rem;
-            border-radius: 0.5rem;
+            border-radius: 9999px;
             text-decoration: none;
             font-weight: 600;
             transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .cta-button:hover {
-            background-color: #d1d1d1;
-        }
-        
-        /* --- Terminal Window Simulation --- */
-        .terminal-section {
-            display: flex;
-            justify-content: center;
-            padding: 0 2rem 4rem;
-        }
-        .terminal-window {
-            background-color: rgba(20, 20, 20, 0.8);
-            border: 1px solid #333;
-            border-radius: 0.5rem;
-            width: 100%;
-            max-width: 700px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            backdrop-filter: blur(20px);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            padding: 1rem;
-        }
-        .terminal-header {
-            padding-bottom: 1rem;
-            color: #666;
-            border-bottom: 1px solid #333;
-        }
-        .terminal-body {
-            padding-top: 1rem;
-            color: #ddd;
-        }
-        .terminal-body pre {
-            margin: 0;
-        }
-        .terminal-body .command::before {
-            content: '$ ';
-            color: #888;
-        }
-        .terminal-body .output {
-            color: #00f5a0;
+            background-color: #6D28D9;
         }
 
-        /* --- Features Section --- */
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
+        /* --- Features & Info Sections --- */
+        .content-section {
+            background-color: white;
             padding: 4rem 2rem;
-            flex-wrap: wrap;
+        }
+        .section-container {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
         }
         .feature-card {
-            background-color: transparent;
-            border: 1px solid #333;
-            border-radius: 0.5rem;
+            background-color: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 1rem;
             padding: 2rem;
-            width: 300px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
         }
         .feature-card h3 {
+            font-family: 'Lora', serif;
             font-size: 1.5rem;
             margin-top: 0;
-            color: #fff;
+            color: #1E293B;
         }
         .feature-card p {
-            color: #a3a3a3;
+            color: #475569;
             line-height: 1.6;
         }
-
-        /* --- Information Section Styling --- */
         .info-section {
             padding: 4rem 2rem;
             text-align: center;
         }
         .info-section h2 {
+            font-family: 'Lora', serif;
             font-size: 2.5rem;
-            color: #fff;
+            color: #1E293B;
             margin-bottom: 3rem;
         }
         .logo-grid {
@@ -177,13 +184,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: rgba(30, 30, 30, 0.5);
-            border: 1px solid #333;
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
             border-radius: 0.5rem;
             padding: 1.5rem;
             font-size: 1.2rem;
             font-weight: 600;
-            color: #a3a3a3;
+            color: #64748B;
         }
         .info-subsection {
             margin-bottom: 5rem;
@@ -193,25 +200,26 @@
         footer {
             text-align: center;
             padding: 4rem 2rem;
-            border-top: 1px solid #333;
-            margin-top: 4rem;
+            background-color: #0F172A; /* Dark Navy Footer Background */
+            color: #94A3B8; /* Lighter text for footer */
         }
         
-        /* --- Sign-in & Log-in Page Styles (shared) --- */
+        /* --- Form Page Styles (Sign In / Log In) --- */
         .form-container {
-            display: none; /* Hidden by default, made visible by JavaScript */
+            display: none;
             padding: 2rem;
             max-width: 400px;
             margin: 4rem auto;
-            background-color: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 0.5rem;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
         .form-container h2 {
+            font-family: 'Lora', serif;
             text-align: center;
             font-size: 1.75rem;
             margin-bottom: 2rem;
-            color: #fff;
         }
         .form-group {
             margin-bottom: 1.5rem;
@@ -220,15 +228,12 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #a3a3a3;
         }
         .form-group input {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #444;
+            border: 1px solid #d1d5db;
             border-radius: 0.5rem;
-            background-color: #050505;
-            color: #fff;
             box-sizing: border-box;
         }
         .submit-button {
@@ -236,8 +241,8 @@
             padding: 0.75rem;
             border: none;
             border-radius: 0.5rem;
-            background-color: #fff;
-            color: #000;
+            background-color: #1E293B;
+            color: #fff;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
@@ -253,10 +258,9 @@
         .social-button {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #444;
+            border: 1px solid #d1d5db;
             border-radius: 0.5rem;
-            background-color: #111;
-            color: #fff;
+            background-color: #ffffff;
             margin-bottom: 0.5rem;
             cursor: pointer;
             font-weight: 600;
@@ -266,26 +270,22 @@
             margin-top: 2rem;
         }
         .back-to-home a {
-            color: #a3a3a3;
+            color: #64748B;
             text-decoration: none;
             font-size: 0.9rem;
             cursor: pointer;
         }
         .back-to-home a:hover {
-            color: #fff;
+            color: #1E293B;
         }
 
-        /* --- Responsive Design for Smaller Screens --- */
         @media (max-width: 768px) {
-            .main-content h1 {
+            .hero-content h1 {
                 font-size: 2.5rem;
             }
-            nav a {
-                margin: 0 0.5rem;
-            }
-            .features, .logo-grid {
-                flex-direction: column;
-                align-items: center;
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
     </style>
@@ -305,41 +305,37 @@
 
     <!-- This container holds the main homepage content -->
     <div id="mainPage">
-        <main class="main-content">
-            <h1>Welcome User To Aura</h1>
-            <p>Aura is a platform for running full stack applications and databases close to your users. We run your code in tiny VMs on our own hardware in 30+ regions around the world.</p>
-            <a href="#" class="cta-button">Get Started</a>
-        </main>
-
-        <section class="terminal-section">
-            <div class="terminal-window">
-                <div class="terminal-header">aura launch</div>
-                <div class="terminal-body">
-                    <pre><span class="command">aura launch</span>
-<span class="output">✓ App detected: ruby-getting-started</span>
-<span class="output">✓ App name: roaring-meadow-1234</span>
-<span class="output">✓ Versions: App: 1, Platform: 2</span>
-<span class="output">✓ Deploying to roaring-meadow-1234</span>
-<span class="output">✓ Monitoring deployment... Done!</span></pre>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Welcome <span class="underline">User</span> To Aura</h1>
+                <p>Aura is a platform for running full stack applications and databases close to your users. We run your code in tiny VMs on our own hardware in 30+ regions around the world.</p>
+                <a href="#" class="cta-button">
+                    Get Started
+                    <span>&rarr;</span>
+                </a>
+            </div>
+            <img src="https://fly.io/phx/ui/images/cloud-city-a61199fec62cd744415fcdf4e1be8434.png?vsn=d" class="hero-background" alt="Cloud city illustration">
+        </section>
+        
+        <section class="content-section">
+            <div class="section-container">
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>Run Your Code</h3>
+                        <p>Bring your Dockerfile, or build on Aura with our buildpacks. Go from `git push` to a globally deployed app in minutes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Scale Seamlessly</h3>
+                        <p>Aura orchestrates your application, scaling it up and down based on traffic and demand, in any of our regions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Add a Database</h3>
+                        <p>Provision and manage Postgres databases. We handle the heavy lifting of replication and failover.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="features">
-            <div class="feature-card">
-                <h3>Run Your Code</h3>
-                <p>Bring your Dockerfile, or build on Aura with our buildpacks. Go from `git push` to a globally deployed app in minutes.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Scale Seamlessly</h3>
-                <p>Aura orchestrates your application, scaling it up and down based on traffic and demand, in any of our regions.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Add a Database</h3>
-                <p>Provision and manage Postgres databases. We handle the heavy lifting of replication and failover.</p>
-            </div>
-        </section>
-        
         <section class="info-section">
             <div class="info-subsection">
                 <h2>Trusted By The Best</h2>
@@ -408,7 +404,6 @@
         const mainPage = document.getElementById('mainPage');
         const signInPage = document.getElementById('signInPage');
         const logInPage = document.getElementById('logInPage');
-
         const signInLink = document.getElementById('signInLink');
         const logInLink = document.getElementById('logInLink');
         const logo = document.getElementById('logo');
