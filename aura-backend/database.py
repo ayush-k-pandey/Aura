@@ -104,6 +104,52 @@ def find_user_by_username(username: str):
     conn.close()
     return user
 
-if __name__ == '__main__':
-    print("Initializing database...")
-    init_db()
+# In database.py, add these two new functions at the bottom
+
+def get_recent_glucose_readings(user_id: int, limit: int = 12) -> list:
+    """
+    Fetches the most recent glucose readings for a user.
+    This is CRITICAL for the AI model.
+    """
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute(
+        """
+        SELECT glucose_value FROM glucose_readings
+        WHERE user_id = %s
+        ORDER BY timestamp DESC
+        LIMIT %s;
+        """,
+        (user_id, limit)
+    )
+    readings = cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    # The AI model needs a simple list of numbers, e.g., [120, 125, 130]
+    # The query returns a list of dictionaries, e.g., [{'glucose_value': 120}, ...]
+    # So we extract just the values.
+    # We also reverse the list because the query gets them newest-first, but the model needs them oldest-first.
+    return [reading['glucose_value'] for reading in reversed(readings)]
+
+
+def get_dashboard_data_for_user(user_id: int) -> dict:
+    """
+    Fetches all necessary data for the user's dashboard.
+    """
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    
+    # Fetch user profile info
+    cur.execute("SELECT name, age, weight_kg, height_cm FROM users WHERE id = %s;", (user_id,))
+    user_profile = cur.fetchone()
+    
+    # Fetch last 24 hours of glucose readings
+    cur.execute(
+        """
+        SELECT timestamp, glucose_value FROM glucose_readings
+        WHERE user_id = %s AND timestamp >= NOW() - INTERVAL '24 hours'
+        ORDER BY timestamp ASC;
+        """,
+        (user_id,)
+    )
