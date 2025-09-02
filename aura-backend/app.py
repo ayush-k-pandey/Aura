@@ -5,6 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import database as db
 import simulator
 from intelligent_core import process_user_intent
+import threading
+import model_trainer
+from flask import send_file
+import report_generator
 
 app = Flask(__name__)
 
@@ -88,13 +92,43 @@ def handle_chat_intent():
     
     # This will now ALWAYS have valid data to work with
     ai_response = process_user_intent(
-        user_text=user_message,
-        glucose_history=glucose_history
-    )
+    user_id=user_id, # <-- ADD THIS LINE
+    user_text=user_message,
+    glucose_history=glucose_history
+)
     
     print("--- AI Core processed intent successfully ---")
     return jsonify(ai_response)
-
+# ==================================================================
+# === NEW: AI CALIBRATION ENDPOINT =================================
+# ==================================================================
+@app.route('/api/ai/calibrate', methods=['POST'])
+def calibrate_ai_for_user():
+    """
+    Triggers the AI fine-tuning process for a specific user in the background.
+    """
+    user_id = request.json.get('user_id')
+    if not user_id:
+        return jsonify({"error": "A 'user_id' is required"}), 400
+        
+    print(f"--- [API] Received calibration request for user_id: {user_id} ---")
+    
+    # Run the slow training process in a separate thread
+    # This allows us to send an immediate "started" response back to the frontend
+    # without making the user wait for the training to finish.
+    training_thread = threading.Thread(
+        target=model_trainer.fine_tune_model_for_user,
+        args=(int(user_id),) # Ensure user_id is an integer
+    )
+    training_thread.start() # Start the background task
+    
+    # Immediately return a 202 Accepted response to the frontend
+    return jsonify({
+        "status": "Calibration Initiated",
+        "message": f"AI model personalization has started for user {user_id}. " \
+                   "This process runs in the background and may take several minutes. " \
+                   "Predictions will automatically use the new model once complete."
+    }), 202
 @app.route("/api/dashboard", methods=['GET'])
 def get_dashboard():
     user_id = request.args.get('user_id')
@@ -103,7 +137,34 @@ def get_dashboard():
 
     dashboard_data = db.get_dashboard_data_for_user(user_id)
     return jsonify(dashboard_data)
-
+# ==================================================================
+# === NEW: PDF REPORT DOWNLOAD ENDPOINT ============================
+# ==================================================================
+@app.route('/api/user/report', methods=['GET'])
+def download_user_report():
+    """
+    Generates a PDF report for a user and sends it as a file download.
+    """
+    user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({"error": "A 'user_id' query parameter is required"}), 400
+        
+    print(f"--- [API] Received report generation request for user_id: {user_id} ---")
+    
+    try:
+        # Call the report generator, which returns the path and a clean filename
+        pdf_path, pdf_filename = report_generator.create_user_report(int(user_id))
+        
+        # Send the generated file back to the browser for download
+        return send_file(
+            pdf_path, 
+            as_attachment=True, 
+            download_name=pdf_filename # This is the name the user will see
+        )
+        
+    except Exception as e:
+        print(f"--- [API] ERROR: Failed to generate report. Error: {e} ---")
+        return jsonify({"error": f"An error occurred while generating the report: {e}"}), 500
 @app.route('/api/dev/simulate-data', methods=['POST'])
 def simulate_data_endpoint():
     user_id = request.json.get('user_id')
