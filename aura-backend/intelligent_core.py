@@ -1,69 +1,64 @@
-# This is the function Backend Developer 1 will call from the new /api/intent endpoint
-def process_user_intent(user_text: str, current_glucose_history: list) -> dict:
+# file: intelligent_core.py
+
+# --- Import all the AI components you have built ---
+
+# Your enhanced NLP class is inside this file
+from natural_language_processor import EnhancedNLPProcessor
+
+# The function from your first trained model
+from prediction_service import predict_future_glucose
+
+# The function from your second trained model (the RL agent)
+from recommendation_service import get_insulin_recommendation
+
+
+# --- Initialize the AI components ---
+# We create one instance of your NLP processor to use everywhere.
+# This is efficient as it builds the lookup maps only once.
+print("Initializing Enhanced NLP Processor...")
+NLP_PROCESSOR = EnhancedNLPProcessor()
+print("NLP Processor ready.")
+
+
+def process_user_intent(user_text: str, glucose_history: list) -> dict:
+    """
+    The main brain of the Aura AI system.
+    This function takes the user's raw text and current glucose data,
+    and returns a complete situational analysis and set of recommendations.
+    This is the only function the main server (app.py) needs to call.
+    """
     
-    # ------------------------------------------------------------------
-    # STAGE 1: Natural Language Understanding (NLU) - The NLP part
-    # ------------------------------------------------------------------
-    # Here, you'll parse the user's text to extract key information.
-    # For a hackathon, this can be simple keyword spotting.
+    print(f"--- [AI Core] Processing new intent: '{user_text}' ---")
     
-    carbs = 0
-    activity = None
+    # 1. UNDERSTAND: Use your enhanced NLP to convert raw text into structured data.
+    parsed_entities = NLP_PROCESSOR.parse_user_text(user_text)
+    carbs = parsed_entities.get("carbs", 0)
+    activity_detected = len(parsed_entities.get("activities_detected", [])) > 0
     
-    if "pizza" in user_text: carbs += 55
-    if "coke" in user_text and "diet" not in user_text: carbs += 30
-    if "pasta" in user_text: carbs += 70
-    if "salad" in user_text: carbs += 5
-    if "walk" in user_text: activity = "walk"
-    # ... more keywords ...
-    
-    # ------------------------------------------------------------------
-    # STAGE 2: Simulation & Prediction - Your LSTM model's job
-    # ------------------------------------------------------------------
-    # You run a "what-if" simulation. You take the user's real history
-    # and add the hypothetical future carbs to it to create a simulated future.
-    
-    simulated_future_glucose = your_lstm_prediction_function(
-        history=current_glucose_history, 
-        future_carbs=carbs, 
-        future_activity=activity 
-    ) # Note: You'll need to slightly modify your LSTM function to accept future events.
-    
-    # ------------------------------------------------------------------
-    # STAGE 3: Recommendation & Advice - Your RL model's job
-    # ------------------------------------------------------------------
-    # Your RL agent now looks at the situation (current glucose, planned carbs)
-    # and provides a dose recommendation.
-    
-    current_glucose = current_glucose_history[-1]
-    recommended_dose = your_rl_recommendation_function(
-        current_glucose=current_glucose, 
-        carbs_to_eat=carbs
+    # 2. RECOMMEND: Get a dose recommendation from the RL agent service.
+    # We use the parsed carbs and activity to provide context.
+    current_glucose = glucose_history[-1] if glucose_history else 120 # Use last known glucose or a default
+    dose_recommendation = get_insulin_recommendation(
+        glucose=current_glucose,
+        carbs=carbs,
+        exercise_recent=activity_detected
     )
     
-    # You also generate "Explainable AI" insights based on the simulation.
-    advice = generate_ai_advice(simulated_future_glucose, recommended_dose)
+    # 3. PREDICT: Get the future glucose forecast from the LSTM model service.
+    # This shows the user what might happen if they do nothing.
+    predicted_curve = predict_future_glucose(glucose_history)
     
-    # ------------------------------------------------------------------
-    # STAGE 4: Package the Response
-    # ------------------------------------------------------------------
-    # You bundle everything into a single, clean JSON object for the frontend.
+    # 4. ADVISE: Get contextual advice from the NLP module's advanced logic.
+    contextual_advice = NLP_PROCESSOR.get_insulin_adjustment_suggestion(parsed_entities)
     
+    # 5. ASSEMBLE: Package everything into a single, clean JSON object.
+    # This object has everything the frontend needs to update the entire user interface.
     response = {
-        "parsed_carbs": carbs,
-        "parsed_activity": activity,
-        "predicted_glucose_curve": simulated_future_glucose,
-        "recommendation": {
-            "dose": recommended_dose,
-            "reason": advice
-        }
+        "parsed_info": parsed_entities,
+        "dose_recommendation": dose_recommendation,
+        "glucose_prediction": predicted_curve,
+        "contextual_advice": contextual_advice
     }
     
+    print(f"--- [AI Core] Intent processed successfully. ---")
     return response
-
-# You would also need to build out these helper functions
-def generate_ai_advice(predicted_curve, dose):
-    # If the max value in the curve is > 250...
-    # return "Heads up: this might cause a significant spike..."
-    # else return "This looks like a stable choice."
-    pass
