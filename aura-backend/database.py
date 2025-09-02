@@ -92,7 +92,7 @@ def find_user_by_username(username: str):
 def get_recent_glucose_readings(user_id: int, limit: int = 100):
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute("SELECT glucose_value FROM glucose_readings WHERE user_id = %s ORDER BY timestamp DESC LIMIT %s;", (user_id,))
+    cur.execute("SELECT glucose_value FROM glucose_readings WHERE user_id = %s ORDER BY timestamp DESC LIMIT %s;", (user_id, limit))
     readings = cur.fetchall()
     cur.close()
     conn.close()

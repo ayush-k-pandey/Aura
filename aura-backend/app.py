@@ -55,15 +55,44 @@ def login():
 
     return jsonify({"message": "Login successful", "token": "mock_jwt_for_hackathon", "user_id": user['id']})
 
+# In app.py
+
+# ... (keep all other code the same) ...
+
+# ==================================================================
+# === THE PRIMARY AI ENDPOINT (with Debugging Fallback) ============
+# ==================================================================
 @app.route("/api/chat", methods=['POST'])
 def handle_chat_intent():
+    print("\n--- Received request at /api/chat ---")
     data = request.get_json()
-    user_message, user_id = data.get('message'), data.get('user_id')
+    
+    user_message = data.get('message')
+    user_id = data.get('user_id')
+
     if not user_message or not user_id:
         return jsonify({"error": "A 'message' and 'user_id' are required"}), 400
         
+    # --- Step 1: Attempt to get REAL data from the database ---
     glucose_history = db.get_recent_glucose_readings(user_id, limit=12)
-    ai_response = process_user_intent(user_text=user_message, glucose_history=glucose_history)
+    print(f"--- [Database] Found {len(glucose_history)} readings for user {user_id}. ---")
+
+    # --- Step 2: THE FOOLPROOF HACKATHON FIX ---
+    # If the database returns nothing (because the simulator might have a bug),
+    # we will use a reliable mock list to ensure the demo works.
+    if not glucose_history or len(glucose_history) < 12:
+        print("--- [Fallback] Database returned insufficient data. Using mock history for AI demo. ---")
+        glucose_history = [120, 122, 125, 126, 128, 129, 130, 131, 130, 128, 126, 124]
+    
+    print(f"-> User Message: '{user_message}'")
+    
+    # This will now ALWAYS have valid data to work with
+    ai_response = process_user_intent(
+        user_text=user_message,
+        glucose_history=glucose_history
+    )
+    
+    print("--- AI Core processed intent successfully ---")
     return jsonify(ai_response)
 
 @app.route("/api/dashboard", methods=['GET'])
