@@ -9,6 +9,8 @@ import threading
 import model_trainer
 from flask import send_file
 import report_generator
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend for matplotlib
 
 app = Flask(__name__)
 
