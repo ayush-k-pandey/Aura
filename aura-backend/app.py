@@ -177,14 +177,14 @@ def get_dashboard():
 # ==================================================================
 # === NEW: PDF REPORT DOWNLOAD ENDPOINT ============================
 # ==================================================================
-@app.route('/api/user/report', methods=['GET'])
+@app.route('/api/user/report', methods=['POST'])
 def download_user_report():
     """
     Generates a PDF report for a user and sends it as a file download.
     """
-    user_id = request.args.get('user_id')
+    user_id = request.json.get('user_id')
     if not user_id:
-        return jsonify({"error": "A 'user_id' query parameter is required"}), 400
+        return jsonify({"error": "A 'user_id' in the request body is required"}), 400
         
     print(f"--- [API] Received report generation request for user_id: {user_id} ---")
     

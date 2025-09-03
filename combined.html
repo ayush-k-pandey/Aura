@@ -66,9 +66,42 @@
         font-size: 1.75rem;
         cursor: pointer;
         transition: transform 0.2s ease-in-out;
+        background: linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #06b6d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
       .logo:hover {
         transform: scale(1.05);
+      }
+      .logo::before {
+        content: "✨";
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #06b6d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: sparkle 2s ease-in-out infinite;
+      }
+      body[data-theme="dark"] .logo {
+        background: linear-gradient(135deg, #a78bfa 0%, #f472b6 50%, #22d3ee 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      body[data-theme="dark"] .logo::before {
+        background: linear-gradient(135deg, #a78bfa 0%, #f472b6 50%, #22d3ee 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      @keyframes sparkle {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
       }
       nav {
         display: flex;
@@ -277,15 +310,30 @@
         background-color: var(--surface-color);
         transition: transform 0.2s ease-in-out,
           box-shadow 0.2s ease-in-out, background-color 0.3s ease;
+        border: 1px solid var(--border-color);
       }
       .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgb(0 0 0 / 0.1),
           0 4px 6px -4px rgb(0 0 0 / 0.1);
       }
       body[data-theme="dark"] .dashboard-card:hover {
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3),
+        box-shadow: 0 10px 25px -3px rgb(0 0 0 / 0.3),
           0 4px 6px -4px rgb(0 0 0 / 0.3);
+      }
+      
+      /* --- CHART CONTAINER FIX --- */
+      #glucoseChart {
+        max-height: 300px !important;
+        height: 300px !important;
+      }
+      
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+        max-height: 300px;
+        overflow: hidden;
       }
       .dev-button {
         transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
@@ -379,6 +427,227 @@
       }
       body[data-theme="dark"] #moonIcon {
         display: block;
+      }
+
+      /* --- HEALTH SCORE STYLES --- */
+      .health-score-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .health-score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--accent-color) 0deg,
+          var(--accent-color) calc(var(--score-percentage) * 3.6deg),
+          var(--border-color) calc(var(--score-percentage) * 3.6deg),
+          var(--border-color) 360deg
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      
+      .health-score-inner {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background-color: var(--surface-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+      
+      .health-score-value {
+        font-size: 1.8rem;
+        line-height: 1;
+        margin-bottom: 2px;
+      }
+      
+      .health-score-label {
+        font-size: 0.7rem;
+        color: var(--secondary-text-color);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      
+      .health-insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+      
+      .insight-card {
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+      }
+      
+      .insight-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      }
+      
+      .insight-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      
+      .insight-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+      }
+      
+      .insight-title {
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--primary-text-color);
+      }
+      
+      .insight-content {
+        color: var(--secondary-text-color);
+        line-height: 1.5;
+        font-size: 0.9rem;
+      }
+      
+      .insight-value {
+        font-weight: 600;
+        color: var(--primary-text-color);
+      }
+      
+      /* Insight type colors */
+      .insight-glucose { background-color: #ddd6fe; color: #7c3aed; }
+      .insight-activity { background-color: #d1fae5; color: #059669; }
+      .insight-sleep { background-color: #fef3c7; color: #d97706; }
+      .insight-nutrition { background-color: #fce7f3; color: #ec4899; }
+      .insight-medication { background-color: #dbeafe; color: #2563eb; }
+      .insight-stress { background-color: #fee2e2; color: #dc2626; }
+      
+      body[data-theme="dark"] .insight-glucose { background-color: #3730a3; color: #c4b5fd; }
+      body[data-theme="dark"] .insight-activity { background-color: #064e3b; color: #6ee7b7; }
+      body[data-theme="dark"] .insight-sleep { background-color: #92400e; color: #fcd34d; }
+      body[data-theme="dark"] .insight-nutrition { background-color: #9d174d; color: #f9a8d4; }
+      body[data-theme="dark"] .insight-medication { background-color: #1e40af; color: #93c5fd; }
+      body[data-theme="dark"] .insight-stress { background-color: #991b1b; color: #fca5a5; }
+      
+      /* --- DASHBOARD ENHANCEMENTS --- */
+      .dashboard-header {
+        background: linear-gradient(135deg, var(--accent-color) 0%, #ec4899 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .dashboard-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(50%, -50%);
+      }
+      
+      .dashboard-welcome {
+        position: relative;
+        z-index: 1;
+      }
+      
+      .dashboard-welcome h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out 0.2s forwards;
+      }
+      
+      .dashboard-welcome p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0 0 1rem 0;
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out 0.4s forwards;
+      }
+      
+      .dashboard-stats-quick {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1rem;
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out 0.6s forwards;
+      }
+      
+      .quick-stat {
+        text-align: center;
+      }
+      
+      .quick-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: block;
+      }
+      
+      .quick-stat-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .dashboard-controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      
+      .control-button {
+        padding: 0.5rem 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+      }
+      
+      .control-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
       }
     </style>
   </head>
@@ -545,28 +814,61 @@
       class="min-h-screen"
     >
       <div class="max-w-6xl mx-auto space-y-6 p-4 sm:p-6">
-        <div class="flex justify-between items-center">
-          <h2 class="text-2xl font-bold">Dashboard</h2>
-          <div class="flex items-center gap-2">
-            <button
-              id="calibrateAiBtn"
-              class="bg-blue-400 text-blue-800 text-xs font-bold py-1 px-3 rounded-full dev-button"
-            >
-              Calibrate AI
+        <!-- Professional Dashboard Header -->
+        <div class="dashboard-header">
+          <div class="dashboard-welcome">
+            <h1 id="dashboard-greeting">Welcome back!</h1>
+            <p id="dashboard-subtitle">Here's your health overview for today</p>
+            <div class="dashboard-stats-quick">
+              <div class="quick-stat">
+                <span id="quick-glucose" class="quick-stat-value">—</span>
+                <span class="quick-stat-label">Latest Reading</span>
+              </div>
+              <div class="quick-stat">
+                <span id="quick-score" class="quick-stat-value">—</span>
+                <span class="quick-stat-label">Health Score</span>
+              </div>
+              <div class="quick-stat">
+                <span id="quick-trend" class="quick-stat-value">—</span>
+                <span class="quick-stat-label">Trend</span>
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-controls">
+            <button id="calibrateAiBtn" class="control-button">
+              🤖 Calibrate AI
             </button>
-            <button
-              id="devSimulateBtn"
-              class="bg-yellow-400 text-yellow-800 text-xs font-bold py-1 px-3 rounded-full dev-button"
-            >
-              DEV: Add Demo Data
+            <button id="devSimulateBtn" class="control-button">
+              📊 Add Demo Data
             </button>
           </div>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow relative dashboard-card">
-          <canvas id="glucoseChart" height="200"></canvas>
+        <div class="p-4 rounded-2xl shadow relative dashboard-card">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Glucose Levels</h3>
+            <div class="text-sm text-gray-500">Last 24 hours</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="glucoseChart"></canvas>
+          </div>
           <div id="chart-tooltip"></div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <!-- Health Score Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div class="p-4 rounded-2xl shadow dashboard-card">
+            <div class="text-sm text-gray-500 mb-4 text-center">Daily Health Score</div>
+            <div class="health-score-container">
+              <div class="health-score-circle" style="--score-percentage: 0">
+                <div class="health-score-inner">
+                  <div id="health-score-value" class="health-score-value">—</div>
+                  <div class="health-score-label">Score</div>
+                </div>
+              </div>
+            </div>
+            <div id="health-score-trend" class="text-center text-xs text-gray-500 mt-2">—</div>
+          </div>
+          
           <div class="p-4 rounded-2xl shadow dashboard-card">
             <div class="text-sm text-gray-500">Carbs Detected</div>
             <div id="carbs-value" class="text-3xl font-bold">—</div>
@@ -579,6 +881,23 @@
           <div class="p-4 rounded-2xl shadow dashboard-card">
             <div class="text-sm text-gray-500">Short-Term Trend</div>
             <div id="trend-value" class="text-3xl font-bold capitalize">—</div>
+          </div>
+        </div>
+        
+        <!-- Health Insights Section -->
+        <div class="p-4 rounded-2xl shadow dashboard-card">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Health Insights</h3>
+            <button id="refreshInsightsBtn" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+              Refresh
+            </button>
+          </div>
+          <div id="health-insights-container" class="health-insights-grid">
+            <div class="insight-card">
+              <div class="insight-content text-center text-gray-400">
+                No insights available yet. Start logging your data to see personalized health insights.
+              </div>
+            </div>
           </div>
         </div>
         <div class="p-4 rounded-2xl shadow dashboard-card">
@@ -641,6 +960,15 @@
       const chatHistory = document.getElementById("chat-history");
       const thinkingEl = document.getElementById("thinking");
       const chartTooltip = document.getElementById("chart-tooltip");
+      const refreshInsightsBtn = document.getElementById("refreshInsightsBtn");
+      const healthScoreValue = document.getElementById("health-score-value");
+      const healthScoreTrend = document.getElementById("health-score-trend");
+      const healthInsightsContainer = document.getElementById("health-insights-container");
+      const dashboardGreeting = document.getElementById("dashboard-greeting");
+      const dashboardSubtitle = document.getElementById("dashboard-subtitle");
+      const quickGlucose = document.getElementById("quick-glucose");
+      const quickScore = document.getElementById("quick-score");
+      const quickTrend = document.getElementById("quick-trend");
 
       // --- THEME LOGIC ---
       function applyTheme(theme) {
@@ -738,8 +1066,21 @@
               intersect: false,
             },
             scales: {
-              x: { grid: { display: false } },
-              y: { beginAtZero: false, grid: { drawBorder: false } },
+              x: { 
+                grid: { display: false },
+                ticks: {
+                  maxTicksLimit: 8
+                }
+              },
+              y: { 
+                beginAtZero: false, 
+                grid: { drawBorder: false },
+                min: 60,
+                max: 300,
+                ticks: {
+                  stepSize: 40
+                }
+              },
             },
             plugins: {
               legend: { display: true, position: "top", align: "end" },
@@ -917,6 +1258,259 @@
         pushMessage("aura", botReply);
       }
 
+      // --- DASHBOARD HEADER UPDATES ---
+      function updateDashboardHeader(data) {
+        const userProfile = data.user_profile || {};
+        const healthScore = data.health_score || {};
+        const glucoseReadings = data.glucose_readings || [];
+        
+        // Update greeting with user name
+        const userName = userProfile.name || "User";
+        const firstName = userName.split(' ')[0];
+        const currentHour = new Date().getHours();
+        let greeting = "";
+        
+        if (currentHour < 12) greeting = `Good morning, ${firstName}!`;
+        else if (currentHour < 17) greeting = `Good afternoon, ${firstName}!`;
+        else greeting = `Good evening, ${firstName}!`;
+        
+        dashboardGreeting.textContent = greeting;
+        
+        // Update subtitle with contextual message
+        const score = healthScore.score;
+        let subtitle = "Here's your health overview for today";
+        
+        if (score !== null) {
+          if (score >= 85) subtitle = "You're doing an excellent job managing your diabetes! 🌟";
+          else if (score >= 75) subtitle = "Good progress with your diabetes management 👍";
+          else if (score >= 60) subtitle = "Let's work together to improve your health metrics 💪";
+          else subtitle = "Your health needs some attention - we're here to help 🩺";
+        }
+        
+        dashboardSubtitle.textContent = subtitle;
+        
+        // Update quick stats
+        if (glucoseReadings.length > 0) {
+          const latestReading = glucoseReadings[glucoseReadings.length - 1];
+          quickGlucose.textContent = `${latestReading.glucose_value} mg/dL`;
+          
+          // Determine trend from last few readings
+          if (glucoseReadings.length >= 3) {
+            const last3 = glucoseReadings.slice(-3).map(r => r.glucose_value);
+            const avgChange = (last3[2] - last3[0]) / 2;
+            if (avgChange > 15) quickTrend.textContent = "Rising ↗️";
+            else if (avgChange < -15) quickTrend.textContent = "Falling ↘️";
+            else quickTrend.textContent = "Stable ➡️";
+          } else {
+            quickTrend.textContent = "Stable ➡️";
+          }
+        } else {
+          quickGlucose.textContent = "—";
+          quickTrend.textContent = "—";
+        }
+        
+        // Update quick score
+        if (score !== null) {
+          quickScore.textContent = `${score}/100`;
+        } else {
+          quickScore.textContent = "—";
+        }
+      }
+
+      // --- HEALTH SCORE & INSIGHTS ---
+      function updateHealthScore(data) {
+        // Use health_score from backend API instead of calculating locally
+        const healthScore = data.health_score || {};
+        const score = healthScore.score !== null ? healthScore.score : 0;
+        const timeInRange = healthScore.time_in_range_percent !== null ? healthScore.time_in_range_percent : 0;
+        
+        const scoreElement = healthScoreValue;
+        const trendElement = healthScoreTrend;
+        const circleElement = document.querySelector('.health-score-circle');
+        
+        // Animate score update
+        const currentScore = parseInt(scoreElement.textContent) || 0;
+        const targetScore = score;
+        const duration = 1000;
+        const startTime = Date.now();
+        
+        function animateScore() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+          const currentValue = Math.round(currentScore + (targetScore - currentScore) * easeOutQuart);
+          
+          scoreElement.textContent = currentValue;
+          circleElement.style.setProperty('--score-percentage', currentValue);
+          
+          if (progress < 1) {
+            requestAnimationFrame(animateScore);
+          }
+        }
+        
+        animateScore();
+        
+        // Update trend based on score and message
+        let trendText = "No data available";
+        if (healthScore.score !== null) {
+          if (score >= 80) trendText = "Excellent control";
+          else if (score >= 70) trendText = "Good control";
+          else if (score >= 60) trendText = "Fair control";
+          else trendText = "Needs attention";
+        } else if (healthScore.message) {
+          trendText = healthScore.message;
+        }
+        
+        trendElement.textContent = trendText;
+        
+        // Update color based on score
+        let color = '#059669'; // green
+        if (score < 60) color = '#dc2626'; // red
+        else if (score < 80) color = '#d97706'; // yellow
+        
+        circleElement.style.setProperty('--accent-color', color);
+      }
+
+      function generateHealthInsights(data) {
+        const insights = [];
+        const healthScore = data.health_score || {};
+        const readings = data.glucose_readings || [];
+        
+        if (!readings || readings.length < 3) {
+          return [{
+            type: 'info',
+            icon: '📊',
+            title: 'Getting Started',
+            content: 'Keep logging your glucose readings and meals to unlock personalized insights.'
+          }];
+        }
+
+        // Use backend health score data for insights
+        if (healthScore.score !== null) {
+          // Time in Range Analysis
+          const timeInRangePercent = healthScore.time_in_range_percent || 0;
+          
+          insights.push({
+            type: 'glucose',
+            icon: '📈',
+            title: 'Time in Range',
+            content: `You're in the target range (70-180 mg/dL) <span class="insight-value">${timeInRangePercent}%</span> of the time. ${timeInRangePercent >= 70 ? 'Great job!' : 'Aim for at least 70%.'}`
+          });
+
+          // Hypoglycemic events
+          const hypoEvents = healthScore.hypo_events_count || 0;
+          if (hypoEvents > 0) {
+            insights.push({
+              type: 'medication',
+              icon: '⚠️',
+              title: 'Low Glucose Events',
+              content: `You had <span class="insight-value">${hypoEvents}</span> low glucose event${hypoEvents > 1 ? 's' : ''} in the last 24 hours. Consider adjusting insulin timing or having snacks available.`
+            });
+          }
+
+          // Overall score insight
+          const score = healthScore.score;
+          let scoreInsight = '';
+          let scoreIcon = '';
+          let scoreType = 'glucose';
+          
+          if (score >= 80) {
+            scoreInsight = `Excellent health score of <span class="insight-value">${score}/100</span>! Keep up the great diabetes management.`;
+            scoreIcon = '🌟';
+            scoreType = 'activity';
+          } else if (score >= 70) {
+            scoreInsight = `Good health score of <span class="insight-value">${score}/100</span>. Small improvements could make a big difference.`;
+            scoreIcon = '👍';
+            scoreType = 'glucose';
+          } else if (score >= 60) {
+            scoreInsight = `Health score of <span class="insight-value">${score}/100</span>. Focus on staying in range more often.`;
+            scoreIcon = '📊';
+            scoreType = 'nutrition';
+          } else {
+            scoreInsight = `Health score of <span class="insight-value">${score}/100</span>. Let's work together to improve your glucose control.`;
+            scoreIcon = '💪';
+            scoreType = 'medication';
+          }
+          
+          insights.push({
+            type: scoreType,
+            icon: scoreIcon,
+            title: 'Daily Health Score',
+            content: scoreInsight
+          });
+        }
+
+        // Recent glucose trends
+        if (readings.length >= 6) {
+          const recent = readings.slice(-6).map(r => r.glucose_value);
+          const trend = recent[5] - recent[0];
+          
+          if (Math.abs(trend) > 30) {
+            insights.push({
+              type: trend > 0 ? 'medication' : 'nutrition',
+              icon: trend > 0 ? '📈' : '📉',
+              title: 'Recent Trend',
+              content: `Your glucose has ${trend > 0 ? 'risen' : 'dropped'} by <span class="insight-value">${Math.abs(Math.round(trend))} mg/dL</span> in recent readings. ${trend > 0 ? 'Monitor closely and consider insulin if needed.' : 'Good downward trend!'}`
+            });
+          }
+        }
+
+        // Exercise Recommendation
+        if (readings.length > 0) {
+          const recent = readings.slice(-3).map(r => r.glucose_value);
+          const avgRecent = recent.reduce((a, b) => a + b) / recent.length;
+          
+          if (avgRecent > 160) {
+            insights.push({
+              type: 'activity',
+              icon: '🏃',
+              title: 'Activity Suggestion',
+              content: `Your recent average glucose is <span class="insight-value">${Math.round(avgRecent)} mg/dL</span>. A 15-minute walk could help bring it down naturally.`
+            });
+          }
+        }
+
+        // Sleep Quality (general recommendation)
+        insights.push({
+          type: 'sleep',
+          icon: '😴',
+          title: 'Sleep Impact',
+          content: 'Quality sleep helps regulate glucose levels. Aim for <span class="insight-value">7-8 hours</span> of consistent sleep each night.'
+        });
+
+        // Nutrition tip
+        insights.push({
+          type: 'nutrition',
+          icon: '🥗',
+          title: 'Nutrition Tip',
+          content: 'Pair carbohydrates with protein and fiber to help stabilize glucose levels and improve your time in range.'
+        });
+
+        return insights.slice(0, 6); // Limit to 6 insights
+      }
+
+      function updateHealthInsights(data) {
+        const insights = generateHealthInsights(data);
+        const container = healthInsightsContainer;
+        
+        container.innerHTML = '';
+        
+        insights.forEach(insight => {
+          const card = document.createElement('div');
+          card.className = 'insight-card';
+          card.innerHTML = `
+            <div class="insight-header">
+              <div class="insight-icon insight-${insight.type}">
+                ${insight.icon}
+              </div>
+              <div class="insight-title">${insight.title}</div>
+            </div>
+            <div class="insight-content">${insight.content}</div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
       // --- API CALLS ---
       async function callApi(endpoint, options = {}) {
         try {
@@ -947,8 +1541,14 @@
             `/api/dashboard?user_id=${currentUserId}`
           );
           updateChart(data.glucose_readings || []);
+          updateHealthScore(data);
+          updateHealthInsights(data);
+          updateDashboardHeader(data);
         } catch (error) {
           updateChart([]);
+          updateHealthScore({ glucose_readings: [] });
+          updateHealthInsights({ glucose_readings: [] });
+          updateDashboardHeader({ user_profile: {}, health_score: {}, glucose_readings: [] });
         }
       }
 
@@ -1018,8 +1618,10 @@
       logOutButton.addEventListener("click", (e) => {
         e.preventDefault();
         currentUserId = null;
+        localStorage.removeItem("currentUserId");
         showMainPage();
       });
+
       backToHomeLinks.forEach((link) => {
         link.addEventListener("click", (e) => {
           e.preventDefault();
@@ -1037,9 +1639,11 @@
         downloadReportBtn.style.pointerEvents = "none";
 
         try {
-          const blob = await callApi(
-            `/api/user/report?user_id=${currentUserId}`
-          );
+          const blob = await callApi(`/api/user/report`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: currentUserId }),
+          });
 
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -1084,6 +1688,20 @@
         } catch (error) {}
       });
 
+      refreshInsightsBtn.addEventListener("click", async () => {
+        if (!currentUserId) return alert("Log in first.");
+        try {
+          const data = await callApi(
+            `/api/dashboard?user_id=${currentUserId}`
+          );
+          updateHealthScore(data);
+          updateHealthInsights(data);
+          updateDashboardHeader(data);
+        } catch (error) {
+          console.error("Failed to refresh insights:", error);
+        }
+      });
+
       registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const userData = {
@@ -1125,6 +1743,7 @@
             body: JSON.stringify(loginData),
           });
           currentUserId = data.user_id;
+          localStorage.setItem("currentUserId", currentUserId);
           await showDashboardPage();
         } catch (error) {}
       });
@@ -1149,6 +1768,9 @@
             historicalData.glucose_readings || [],
             aiResponse.glucose_prediction.adjusted_prediction || []
           );
+          updateHealthScore(historicalData);
+          updateHealthInsights(historicalData);
+          updateDashboardHeader(historicalData);
         } catch (error) {
           pushMessage(
             "aura",
@@ -1180,9 +1802,15 @@
       document.addEventListener("DOMContentLoaded", () => {
         const savedTheme = localStorage.getItem("theme") || "light";
         applyTheme(savedTheme);
-
         initChart();
-        showMainPage();
+
+        const savedUserId = localStorage.getItem("currentUserId");
+        if (savedUserId) {
+          currentUserId = savedUserId;
+          showDashboardPage();
+        } else {
+          showMainPage();
+        }
       });
     </script>
   </body>
